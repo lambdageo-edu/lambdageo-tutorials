@@ -71,7 +71,7 @@ mkdir hs2json && cd hs2json
 cabal init --interactive
 ```
 
-Ele faz uma série de perguntas — nome do pacote (`hs2json`), versão, se você quer uma biblioteca, um executável e uma suíte de testes (responda **sim** para os três), licença, linguagem. Ao final, a estrutura gerada é:
+Ele faz uma série de perguntas — nome do pacote (`hs2json`), versão, se você quer uma biblioteca, um executável e uma suíte de testes (responda **3* para ele incluir executavel e biblioteca), licença, linguagem. Ao final, a estrutura gerada é:
 
 ```
 hs2json/
@@ -80,8 +80,7 @@ hs2json/
 │   └── MyLib.hs       👈 a biblioteca (código reutilizável)
 ├── app/
 │   └── Main.hs         👈 o executável (o programa em si)
-└── test/
-    └── Main.hs           👈 testes (não usaremos neste capítulo)
+
 ```
 
 !!! tip
