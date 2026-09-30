@@ -1726,15 +1726,13 @@ O runtime do GHC já depende do GMP, então normalmente já está instalado; fal
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>mkdir<span class="w"> </span>hs2json<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>hs2json
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>cabal<span class="w"> </span>init<span class="w"> </span>--interactive
 </code></pre></div>
-<p>Ele faz uma série de perguntas — nome do pacote (<code>hs2json</code>), versão, se você quer uma biblioteca, um executável e uma suíte de testes (responda <strong>sim</strong> para os três), licença, linguagem. Ao final, a estrutura gerada é:</p>
+<p>Ele faz uma série de perguntas — nome do pacote (<code>hs2json</code>), versão, se você quer uma biblioteca, um executável e uma suíte de testes (responda *<em>3</em> para ele incluir executavel e biblioteca), licença, linguagem. Ao final, a estrutura gerada é:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>hs2json/
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>├── hs2json.cabal     👈 a descrição do pacote (nome, versão, dependências, módulos)
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>├── src/
 <a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>│   └── MyLib.hs       👈 a biblioteca (código reutilizável)
 <a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>├── app/
 <a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>│   └── Main.hs         👈 o executável (o programa em si)
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>└── test/
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>    └── Main.hs           👈 testes (não usaremos neste capítulo)
 </code></pre></div>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
