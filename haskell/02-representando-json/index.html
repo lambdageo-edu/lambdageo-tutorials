@@ -1674,18 +1674,15 @@
 <p>Para começar a experimentar esse código, siga estes passos:</p>
 <ol>
 <li>Salve o arquivo <code>SimpleJSON.hs</code> no seu editor.</li>
-<li>
-<p><strong>Atualize o arquivo <code>.cabal</code> do seu projeto:</strong> como acabamos de criar um <em>novo arquivo</em> (um novo módulo), precisamos informar ao Cabal sobre sua existência. Abra o arquivo <code>.cabal</code> do seu projeto (ex: <code>hs2json.cabal</code>) e adicione <code>SimpleJSON</code> à lista de <code>exposed-modules</code> na seção <code>library</code>:
+<li><strong>Atualize o arquivo <code>.cabal</code> do seu projeto:</strong> como acabamos de criar um <em>novo arquivo</em> (um novo módulo), precisamos informar ao Cabal sobre sua existência. Abra o arquivo <code>.cabal</code> do seu projeto (ex: <code>hs2json.cabal</code>) e adicione <code>SimpleJSON</code> à lista de <code>exposed-modules</code> na seção <code>library</code>:
    <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>library
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    exposed-modules:  SimpleJSON  -- &lt;--- Adicionado aqui
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    hs-source-dirs:   src
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    build-depends:    base &gt;=4.14
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    default-language: Haskell2010
-</code></pre></div></p>
-</li>
-<li>
-<p>Alterne para uma janela de terminal e carregue o projeto no REPL executando o seguinte comando na raiz do projeto:</p>
-</li>
+</code></pre></div>
+      <em>(Se você já tiver outros módulos, como <code>MyLib</code>, basta adicioná-los separados por vírgula ou em linhas novas nesta mesma lista).</em></li>
+<li>Alterne para uma janela de terminal e carregue o projeto no REPL executando o seguinte comando na raiz do projeto:</li>
 </ol>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>$ cabal repl
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>Resolving dependencies...
