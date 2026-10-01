@@ -1668,128 +1668,146 @@
 <a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">              </span><span class="kr">deriving</span><span class="w"> </span><span class="p">(</span><span class="kt">Eq</span><span class="p">,</span><span class="w"> </span><span class="kt">Ord</span><span class="p">,</span><span class="w"> </span><span class="kt">Show</span><span class="p">)</span>
 </code></pre></div>
 <p>Para cada tipo de JSON, fornecemos um construtor de valor distinto. Alguns desses construtores possuem parâmetros: se quisermos construir uma string JSON, devemos fornecer um valor <code>String</code> como argumento para o construtor <code>JString</code>.</p>
-<p>Para começar a experimentar esse código, salve o arquivo <code>SimpleJSON.hs</code> no seu editor, alterne para uma janela de terminal e carregue o projeto no REPL executando o seguinte comando na raiz do projeto:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>$ cabal repl
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>Resolving dependencies...
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>Build profile: -w ghc-9.4.7 -O1
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>...
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>GHCi, version 9.4.7: https://www.haskell.org/ghc/  :? for help
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>[1 of 2] Compiling SimpleJSON       ( src/SimpleJSON.hs, interpreted )
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>[2 of 2] Compiling Main             ( app/Main.hs, interpreted )
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>Ok, two modules loaded.
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>ghci&gt; JString "foo"
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>JString "foo"
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>ghci&gt; JNumber 2.7
-<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>JNumber 2.7
-<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>ghci&gt; :type JBool True
-<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>JBool True :: JValue
+<p>Aqui está a versão atualizada dessa seção do tutorial, incluindo o passo crucial de registrar o novo módulo no arquivo <code>.cabal</code> antes de carregar o REPL. </p>
+<p>Você pode substituir o parágrafo original por este bloco:</p>
+<hr />
+<p>Para começar a experimentar esse código, siga estes passos:</p>
+<ol>
+<li>Salve o arquivo <code>SimpleJSON.hs</code> no seu editor.</li>
+<li>
+<p><strong>Atualize o arquivo <code>.cabal</code> do seu projeto:</strong> como acabamos de criar um <em>novo arquivo</em> (um novo módulo), precisamos informar ao Cabal sobre sua existência. Abra o arquivo <code>.cabal</code> do seu projeto (ex: <code>hs2json.cabal</code>) e adicione <code>SimpleJSON</code> à lista de <code>exposed-modules</code> na seção <code>library</code>:
+   <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>library
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    exposed-modules:  SimpleJSON  -- &lt;--- Adicionado aqui
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    hs-source-dirs:   src
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    build-depends:    base &gt;=4.14
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    default-language: Haskell2010
+</code></pre></div></p>
+</li>
+<li>
+<p>Alterne para uma janela de terminal e carregue o projeto no REPL executando o seguinte comando na raiz do projeto:</p>
+</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>$ cabal repl
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>Resolving dependencies...
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>Build profile: -w ghc-9.4.7 -O1
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>...
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>GHCi, version 9.4.7: https://www.haskell.org/ghc/  :? for help
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>[1 of 2] Compiling SimpleJSON       ( src/SimpleJSON.hs, interpreted )
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>[2 of 2] Compiling Main             ( app/Main.hs, interpreted )
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>Ok, two modules loaded.
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>ghci&gt; JString "foo"
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>JString "foo"
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>ghci&gt; JNumber 2.7
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>JNumber 2.7
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>ghci&gt; :type JBool True
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>JBool True :: JValue
 </code></pre></div>
 <p><em>(A saída exata do cabeçalho varia com as versões, mas o prompt e o comportamento são estes.)</em></p>
 <p>Podemos ver como usar um construtor para pegar um valor Haskell normal e transformá-lo em um <code>JValue</code>. Para fazer o inverso, usamos casamento de padrões. Aqui está uma função que podemos adicionar ao <code>SimpleJSON.hs</code>, que irá extrair uma string de um valor JSON para nós. Se o valor JSON realmente contiver uma string, nossa função envolverá a string com o construtor <code>Just</code>. Caso contrário, retornará <code>Nothing</code>.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">-- src/SimpleJSON.hs</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nf">getString</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">JValue</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">Maybe</span><span class="w"> </span><span class="kt">String</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="nf">getString</span><span class="w"> </span><span class="p">(</span><span class="kt">JString</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kt">Just</span><span class="w"> </span><span class="n">s</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="nf">getString</span><span class="w"> </span><span class="kr">_</span><span class="w">           </span><span class="ow">=</span><span class="w"> </span><span class="kt">Nothing</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1">-- src/SimpleJSON.hs</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nf">getString</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">JValue</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">Maybe</span><span class="w"> </span><span class="kt">String</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="nf">getString</span><span class="w"> </span><span class="p">(</span><span class="kt">JString</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kt">Just</span><span class="w"> </span><span class="n">s</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="nf">getString</span><span class="w"> </span><span class="kr">_</span><span class="w">           </span><span class="ow">=</span><span class="w"> </span><span class="kt">Nothing</span>
 </code></pre></div>
 <p>Quando salvamos o arquivo de código-fonte modificado, podemos recarregá-lo no <code>cabal repl</code> com o comando <code>:r</code> e testar a nova definição:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>ghci&gt; :r
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>[1 of 2] Compiling SimpleJSON       ( src/SimpleJSON.hs, interpreted )
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>Ok, two modules loaded.
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>ghci&gt; getString (JString "hello")
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>Just "hello"
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>ghci&gt; getString (JNumber 3)
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>Nothing
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>ghci&gt; :r
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>[1 of 2] Compiling SimpleJSON       ( src/SimpleJSON.hs, interpreted )
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>Ok, two modules loaded.
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>ghci&gt; getString (JString "hello")
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>Just "hello"
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>ghci&gt; getString (JNumber 3)
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>Nothing
 </code></pre></div>
 <p>A seguir, mais algumas funções acessoras. Desta vez incluímos as assinaturas de tipo — o GHC as infere sozinho, mas escrevê-las é uma boa prática (e, quando ativarmos <code>-Wall</code> no <code>.cabal</code>, mais adiante, o GHC vai nos lembrar disso com um aviso caso esqueçamos):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1">-- src/SimpleJSON.hs</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nf">getInt</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">JValue</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">Maybe</span><span class="w"> </span><span class="kt">Int</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="nf">getInt</span><span class="w"> </span><span class="p">(</span><span class="kt">JNumber</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kt">Just</span><span class="w"> </span><span class="p">(</span><span class="n">truncate</span><span class="w"> </span><span class="n">n</span><span class="p">)</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="nf">getInt</span><span class="w"> </span><span class="kr">_</span><span class="w">           </span><span class="ow">=</span><span class="w"> </span><span class="kt">Nothing</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="nf">getDouble</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">JValue</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">Maybe</span><span class="w"> </span><span class="kt">Double</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="nf">getDouble</span><span class="w"> </span><span class="p">(</span><span class="kt">JNumber</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kt">Just</span><span class="w"> </span><span class="n">n</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="nf">getDouble</span><span class="w"> </span><span class="kr">_</span><span class="w">           </span><span class="ow">=</span><span class="w"> </span><span class="kt">Nothing</span>
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>
-<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="nf">getBool</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">JValue</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">Maybe</span><span class="w"> </span><span class="kt">Bool</span>
-<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="nf">getBool</span><span class="w"> </span><span class="p">(</span><span class="kt">JBool</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kt">Just</span><span class="w"> </span><span class="n">b</span>
-<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="nf">getBool</span><span class="w"> </span><span class="kr">_</span><span class="w">         </span><span class="ow">=</span><span class="w"> </span><span class="kt">Nothing</span>
-<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>
-<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="nf">getObject</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">JValue</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">Maybe</span><span class="w"> </span><span class="p">[(</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">JValue</span><span class="p">)]</span>
-<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="nf">getObject</span><span class="w"> </span><span class="p">(</span><span class="kt">JObject</span><span class="w"> </span><span class="n">o</span><span class="p">)</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kt">Just</span><span class="w"> </span><span class="n">o</span>
-<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="nf">getObject</span><span class="w"> </span><span class="kr">_</span><span class="w">           </span><span class="ow">=</span><span class="w"> </span><span class="kt">Nothing</span>
-<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>
-<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a><span class="nf">getArray</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">JValue</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">Maybe</span><span class="w"> </span><span class="p">[</span><span class="kt">JValue</span><span class="p">]</span>
-<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a><span class="nf">getArray</span><span class="w"> </span><span class="p">(</span><span class="kt">JArray</span><span class="w"> </span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kt">Just</span><span class="w"> </span><span class="n">a</span>
-<a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a><span class="nf">getArray</span><span class="w"> </span><span class="kr">_</span><span class="w">          </span><span class="ow">=</span><span class="w"> </span><span class="kt">Nothing</span>
-<a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>
-<a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a><span class="nf">isNull</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">JValue</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">Bool</span>
-<a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a><span class="nf">isNull</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kt">JNull</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1">-- src/SimpleJSON.hs</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nf">getInt</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">JValue</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">Maybe</span><span class="w"> </span><span class="kt">Int</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="nf">getInt</span><span class="w"> </span><span class="p">(</span><span class="kt">JNumber</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kt">Just</span><span class="w"> </span><span class="p">(</span><span class="n">truncate</span><span class="w"> </span><span class="n">n</span><span class="p">)</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="nf">getInt</span><span class="w"> </span><span class="kr">_</span><span class="w">           </span><span class="ow">=</span><span class="w"> </span><span class="kt">Nothing</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="nf">getDouble</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">JValue</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">Maybe</span><span class="w"> </span><span class="kt">Double</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="nf">getDouble</span><span class="w"> </span><span class="p">(</span><span class="kt">JNumber</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kt">Just</span><span class="w"> </span><span class="n">n</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="nf">getDouble</span><span class="w"> </span><span class="kr">_</span><span class="w">           </span><span class="ow">=</span><span class="w"> </span><span class="kt">Nothing</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="nf">getBool</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">JValue</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">Maybe</span><span class="w"> </span><span class="kt">Bool</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="nf">getBool</span><span class="w"> </span><span class="p">(</span><span class="kt">JBool</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kt">Just</span><span class="w"> </span><span class="n">b</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="nf">getBool</span><span class="w"> </span><span class="kr">_</span><span class="w">         </span><span class="ow">=</span><span class="w"> </span><span class="kt">Nothing</span>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="nf">getObject</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">JValue</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">Maybe</span><span class="w"> </span><span class="p">[(</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">JValue</span><span class="p">)]</span>
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="nf">getObject</span><span class="w"> </span><span class="p">(</span><span class="kt">JObject</span><span class="w"> </span><span class="n">o</span><span class="p">)</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kt">Just</span><span class="w"> </span><span class="n">o</span>
+<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="nf">getObject</span><span class="w"> </span><span class="kr">_</span><span class="w">           </span><span class="ow">=</span><span class="w"> </span><span class="kt">Nothing</span>
+<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>
+<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="nf">getArray</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">JValue</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">Maybe</span><span class="w"> </span><span class="p">[</span><span class="kt">JValue</span><span class="p">]</span>
+<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="nf">getArray</span><span class="w"> </span><span class="p">(</span><span class="kt">JArray</span><span class="w"> </span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kt">Just</span><span class="w"> </span><span class="n">a</span>
+<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a><span class="nf">getArray</span><span class="w"> </span><span class="kr">_</span><span class="w">          </span><span class="ow">=</span><span class="w"> </span><span class="kt">Nothing</span>
+<a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a>
+<a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a><span class="nf">isNull</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">JValue</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">Bool</span>
+<a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a><span class="nf">isNull</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kt">JNull</span>
 </code></pre></div>
 <p>A função <code>truncate</code> transforma um número de ponto flutuante ou racional em um inteiro, descartando os dígitos após o ponto decimal:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>ghci&gt; truncate 5.8
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>5
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>ghci&gt; :module +Data.Ratio
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>ghci&gt; truncate (22 % 7)
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>3
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>ghci&gt; truncate 5.8
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>5
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>ghci&gt; :module +Data.Ratio
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>ghci&gt; truncate (22 % 7)
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>3
 </code></pre></div>
 <h2 id="a-anatomia-de-um-modulo-haskell">A anatomia de um módulo Haskell<a class="headerlink" href="#a-anatomia-de-um-modulo-haskell" title="Permanent link">&para;</a></h2>
 <p>Um arquivo fonte do Haskell contém a definição de um único <em>module</em>. Um módulo nos permite determinar quais nomes dentro dele são acessíveis a partir de outros módulos.</p>
 <p>Um arquivo fonte começa com uma declaração <code>module</code>. Ela deve preceder todas as outras definições no arquivo:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1">-- src/SimpleJSON.hs</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kr">module</span><span class="w"> </span><span class="nn">SimpleJSON</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="p">(</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">      </span><span class="kt">JValue</span><span class="p">(</span><span class="o">..</span><span class="p">)</span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="p">,</span><span class="w"> </span><span class="nf">getString</span>
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="p">,</span><span class="w"> </span><span class="nf">getInt</span>
-<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="p">,</span><span class="w"> </span><span class="nf">getDouble</span>
-<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">    </span><span class="p">,</span><span class="w"> </span><span class="nf">getBool</span>
-<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">    </span><span class="p">,</span><span class="w"> </span><span class="nf">getObject</span>
-<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="w">    </span><span class="p">,</span><span class="w"> </span><span class="nf">getArray</span>
-<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="w">    </span><span class="p">,</span><span class="w"> </span><span class="nf">isNull</span>
-<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="w">    </span><span class="p">)</span><span class="w"> </span><span class="kr">where</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1">-- src/SimpleJSON.hs</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="kr">module</span><span class="w"> </span><span class="nn">SimpleJSON</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="p">(</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">      </span><span class="kt">JValue</span><span class="p">(</span><span class="o">..</span><span class="p">)</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">    </span><span class="p">,</span><span class="w"> </span><span class="nf">getString</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">    </span><span class="p">,</span><span class="w"> </span><span class="nf">getInt</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">    </span><span class="p">,</span><span class="w"> </span><span class="nf">getDouble</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">    </span><span class="p">,</span><span class="w"> </span><span class="nf">getBool</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">    </span><span class="p">,</span><span class="w"> </span><span class="nf">getObject</span>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">    </span><span class="p">,</span><span class="w"> </span><span class="nf">getArray</span>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">    </span><span class="p">,</span><span class="w"> </span><span class="nf">isNull</span>
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">    </span><span class="p">)</span><span class="w"> </span><span class="kr">where</span>
 </code></pre></div>
 <p>A palavra <code>module</code> é reservada. Ela é seguida pelo nome do módulo, que deve começar com uma letra maiúscula. Um arquivo fonte deve ter o mesmo <em>base name</em> (o componente antes do sufixo) que o nome do módulo que ele contém. É por isso que nosso arquivo <code>SimpleJSON.hs</code> contém um módulo chamado <code>SimpleJSON</code>.</p>
 <p>Após o nome do módulo há uma lista de <em>exportações</em>, entre parênteses. A palavra-chave <code>where</code> indica que o corpo do módulo vem a seguir.</p>
 <p>A lista de exportações indica quais nomes deste módulo estão visíveis para outros módulos. Isso nos permite manter o código privado escondido do mundo exterior. A notação especial <code>(..)</code> que segue o nome <code>JValue</code> indica que estamos exportando o tipo <strong>e todos os seus construtores</strong>.</p>
 <p>Pode parecer estranho que possamos exportar o nome de um tipo (isto é, seu construtor de tipo) mas não seus construtores de valor. A capacidade de fazer isso é importante: ela nos permite ocultar os detalhes de um tipo dos seus usuários, tornando o tipo <strong>abstrato</strong>. Se não podemos ver os construtores de valor de um tipo, não podemos casar padrões com um valor desse tipo, nem construir um novo valor desse tipo. Mais adiante neste capítulo, veremos uma situação em que <strong>queremos</strong> exatamente isso.</p>
 <p>Se omitirmos as exportações (e os parênteses que as envolvem) da declaração do módulo, todos os nomes do módulo serão exportados:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kr">module</span><span class="w"> </span><span class="nn">ExportEverything</span><span class="w"> </span><span class="kr">where</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kr">module</span><span class="w"> </span><span class="nn">ExportEverything</span><span class="w"> </span><span class="kr">where</span>
 </code></pre></div>
 <p>Para não exportar nenhum nome (o que raramente é útil), escrevemos uma lista de exportação vazia, usando um par de parênteses:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kr">module</span><span class="w"> </span><span class="nn">ExportNothing</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="kr">where</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kr">module</span><span class="w"> </span><span class="nn">ExportNothing</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="kr">where</span>
 </code></pre></div>
 <h2 id="compilando-um-programa-haskell">Compilando um programa Haskell<a class="headerlink" href="#compilando-um-programa-haskell" title="Permanent link">&para;</a></h2>
 <p>Para compilar o projeto e executar o binário, na raiz do projeto:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>$ cabal build
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>$ cabal run
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>someFunc
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>$ cabal build
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>$ cabal run
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>someFunc
 </code></pre></div>
 <p><em>(O <code>someFunc</code> vem do <code>src/MyLib.hs</code> gerado pelo assistente do <code>cabal init</code> — é o "hello world" do esqueleto.)</em></p>
 <p>Agora que compilamos com sucesso nossa biblioteca mínima, vamos começar a escrever a biblioteca proposta aqui. Antes de seguir, <strong>apague o arquivo <code>src/MyLib.hs</code></strong>, já que não o usaremos mais, e então modifique o <code>app/Main.hs</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1">-- app/Main.hs</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="kr">module</span><span class="w"> </span><span class="nn">Main</span><span class="w"> </span><span class="p">(</span><span class="nf">main</span><span class="p">)</span><span class="w"> </span><span class="kr">where</span>
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="kr">import</span><span class="w"> </span><span class="nn">SimpleJSON</span>
-<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>
-<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="nf">main</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">IO</span><span class="w"> </span><span class="nb">()</span>
-<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="nf">main</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="n">print</span><span class="w"> </span><span class="p">(</span><span class="kt">JObject</span><span class="w"> </span><span class="p">[(</span><span class="s">"foo"</span><span class="p">,</span><span class="w"> </span><span class="kt">JNumber</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="s">"bar"</span><span class="p">,</span><span class="w"> </span><span class="kt">JBool</span><span class="w"> </span><span class="kt">False</span><span class="p">)])</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1">-- app/Main.hs</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="kr">module</span><span class="w"> </span><span class="nn">Main</span><span class="w"> </span><span class="p">(</span><span class="nf">main</span><span class="p">)</span><span class="w"> </span><span class="kr">where</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="kr">import</span><span class="w"> </span><span class="nn">SimpleJSON</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="nf">main</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">IO</span><span class="w"> </span><span class="nb">()</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="nf">main</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="n">print</span><span class="w"> </span><span class="p">(</span><span class="kt">JObject</span><span class="w"> </span><span class="p">[(</span><span class="s">"foo"</span><span class="p">,</span><span class="w"> </span><span class="kt">JNumber</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="s">"bar"</span><span class="p">,</span><span class="w"> </span><span class="kt">JBool</span><span class="w"> </span><span class="kt">False</span><span class="p">)])</span>
 </code></pre></div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p><strong>Diferente do fluxo com hpack: aqui você precisa editar o <code>.cabal</code> à mão.</strong> Sem essa camada de conveniência, o Cabal não descobre <code>SimpleJSON.hs</code> sozinho — é preciso trocar <code>MyLib</code> por <code>SimpleJSON</code> (e remover a referência a <code>MyLib</code>) na lista <code>exposed-modules:</code> da seção <code>library</code> do <code>hs2json.cabal</code>:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>library
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>    exposed-modules:  SimpleJSON
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>    hs-source-dirs:   src
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>    build-depends:    base &gt;=4.14
-<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>    default-language: Haskell2010
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>library
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>    exposed-modules:  SimpleJSON
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>    hs-source-dirs:   src
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>    build-depends:    base &gt;=4.14
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>    default-language: Haskell2010
 </code></pre></div>
 A partir de agora, <strong>todo módulo novo que criarmos em <code>src/</code> precisa entrar nessa lista</strong> — é o preço de não ter o hpack detectando por nós. Em compensação, o arquivo <code>.cabal</code> é sempre exatamente o que está sendo compilado, sem uma etapa de geração no meio.</p>
 </div>
 <p>Observe a diretiva <code>import</code> que segue a declaração do módulo. Ela indica que queremos pegar todos os nomes exportados do módulo <code>SimpleJSON</code> e disponibilizá-los no nosso módulo. Quaisquer diretivas <code>import</code> devem aparecer em grupo, no início do módulo — após a declaração <code>module</code>, mas antes de todo o resto do código. Não podemos espalhá-las pelo arquivo.</p>
 <p>Os nomes dos arquivos fonte e das funções ficam a cargo do programador. Porém, para criar um executável, o GHC espera um módulo chamado <code>Main</code> que contenha uma função chamada <code>main</code>. A função <code>main</code> é a que será chamada quando executarmos o programa.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>$ cabal build
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>$ cabal run
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>JObject [("foo",JNumber 1.0),("bar",JBool False)]
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>$ cabal build
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>$ cabal run
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>JObject [("foo",JNumber 1.0),("bar",JBool False)]
 </code></pre></div>
 
 
