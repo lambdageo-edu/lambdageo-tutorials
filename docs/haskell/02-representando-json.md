@@ -41,7 +41,7 @@ Para começar a experimentar esse código, siga estes passos:
        build-depends:    base >=4.14
        default-language: Haskell2010
    ```
-   
+      *(Se você já tiver outros módulos, como `MyLib`, basta adicioná-los separados por vírgula ou em linhas novas nesta mesma lista).*
 3. Alterne para uma janela de terminal e carregue o projeto no REPL executando o seguinte comando na raiz do projeto:
 
 
