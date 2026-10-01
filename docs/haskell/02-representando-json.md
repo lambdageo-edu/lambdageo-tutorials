@@ -24,7 +24,27 @@ data JValue = JString String
 
 Para cada tipo de JSON, fornecemos um construtor de valor distinto. Alguns desses construtores possuem parâmetros: se quisermos construir uma string JSON, devemos fornecer um valor `String` como argumento para o construtor `JString`.
 
-Para começar a experimentar esse código, salve o arquivo `SimpleJSON.hs` no seu editor, alterne para uma janela de terminal e carregue o projeto no REPL executando o seguinte comando na raiz do projeto:
+Aqui está a versão atualizada dessa seção do tutorial, incluindo o passo crucial de registrar o novo módulo no arquivo `.cabal` antes de carregar o REPL. 
+
+Você pode substituir o parágrafo original por este bloco:
+
+---
+
+Para começar a experimentar esse código, siga estes passos:
+
+1. Salve o arquivo `SimpleJSON.hs` no seu editor.
+2. **Atualize o arquivo `.cabal` do seu projeto:** como acabamos de criar um *novo arquivo* (um novo módulo), precisamos informar ao Cabal sobre sua existência. Abra o arquivo `.cabal` do seu projeto (ex: `hs2json.cabal`) e adicione `SimpleJSON` à lista de `exposed-modules` na seção `library`:
+   ```cabal
+   library
+       exposed-modules:  SimpleJSON  -- <--- Adicionado aqui
+       hs-source-dirs:   src
+       build-depends:    base >=4.14
+       default-language: Haskell2010
+   ```
+   
+3. Alterne para uma janela de terminal e carregue o projeto no REPL executando o seguinte comando na raiz do projeto:
+
+
 
 ```
 $ cabal repl
