@@ -112,9 +112,9 @@ Salve o arquivo e recarregue a página. Você verá o formulário e as duas tare
 
 Agora **digite algo no campo**. Percebeu? **O texto desaparece a cada letra!**
 
-Isso acontece porque o evento `"update_form"` é disparado, mas **ainda não existe uma função para tratá-lo** (`handle_event`). O processo LiveView falha, o supervisor o **reinicia automaticamente** (é assim que a BEAM lida com erros!), e o `mount/3` roda de novo — limpando o campo. Dê uma olhada no terminal do servidor: o erro está registrado lá.
+Isso acontece porque o evento `"update_form"` é disparado, mas **ainda não existe uma função para tratá-lo** (`handle_event`). O processo LiveView daquela página **morre** com o erro; o JavaScript do LiveView, no navegador, percebe a queda e **reconecta**, o que cria um processo novo — e o `mount/3` roda de novo, limpando o campo. Dê uma olhada no terminal do servidor: o erro está registrado lá.
 
-Essa é uma lição dupla: (1) todo evento `phx-*` precisa de um `handle_event` correspondente; (2) quando um processo LiveView "morre", ele renasce do estado inicial.
+Essa é uma lição dupla: (1) todo evento `phx-*` precisa de um `handle_event` correspondente; (2) quando um processo LiveView "morre", a falha fica isolada nele (o servidor continua de pé), e a página recomeça do estado inicial.
 
 ## 🧩 Passo 2.4: Tratando a Digitação (`update_form`)
 

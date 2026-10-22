@@ -15,7 +15,7 @@ O `phx.new` já gerou um `README.md` genérico na raiz do projeto. Vamos substit
 **Aluno(a):** Seu Nome Completo Aqui
 
 **Tutorial original:** [Como Criar um App "Todo List" com Elixir e LiveView
-do Zero](https://github.com/LambdaGeo/tutoriais)
+do Zero](https://lambdageo-edu.github.io/lambdageo-tutorials/elixir/)
 
 ## Descrição
 
@@ -38,7 +38,6 @@ concluída (toggle) e excluir — tudo com atualização instantânea.
 | ---------- | --------- |
 | Erlang/OTP | 26+       |
 | Elixir     | 1.17+     |
-| Node.js    | 18+ (LTS) |
 
 ## Como Rodar
 
@@ -78,7 +77,7 @@ Esse teste revela os dois vacilos clássicos:
 1. **Banco commitado**: se `git status`/a página do GitHub mostrar `elixir_todo_list.db` (ou `.db-shm`/`.db-wal`), o `.gitignore` da Fase 0 não foi aplicado antes do commit. Corrija com:
 
    ```bash
-   git rm --cached elixir_todo_list.db elixir_todo_list.db-shm elixir_todo_list.db-wal
+   git rm --cached --ignore-unmatch elixir_todo_list.db elixir_todo_list.db-shm elixir_todo_list.db-wal
    git commit -m "Remove arquivos de banco do versionamento"
    ```
 

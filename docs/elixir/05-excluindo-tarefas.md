@@ -84,9 +84,9 @@ O Phoenix usa o **HEEx** (_HTML + Embedded Elixir Extended_) — parecido com os
 
 Salve o arquivo. Os botões "X" aparecem. Agora **clique em um deles** e olhe o terminal:
 
-> ❌ `** (UndefinedFunctionError) ... no function clause matching in ElixirTodoListWeb.TodoLive.handle_event/3` (ou erro similar)
+> ❌ `** (FunctionClauseError) no function clause matching in ElixirTodoListWeb.TodoLive.handle_event/3`
 
-O Phoenix está certo: enviamos o evento `"delete"`, mas **nenhuma cláusula de `handle_event` combina com ele** — o pattern matching não encontrou destino. Igualzinho ao "texto que desaparece" da Fase 2: evento sem tratador derruba (e reinicia) o processo.
+O Phoenix está certo: enviamos o evento `"delete"`, mas **nenhuma cláusula de `handle_event` combina com ele** — o pattern matching não encontrou destino. Igualzinho ao "texto que desaparece" da Fase 2: evento sem tratador derruba o processo, e o navegador reconecta com um novo.
 
 ## ⚙️ Passo 5.3: Implementando o `handle_event("delete", ...)`
 

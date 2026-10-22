@@ -10,7 +10,9 @@ Mostre na tela:
 ```bash
 docker run -d --name web -p 8080:80 -v $(pwd)/html:/usr/share/nginx/html:ro nginx:alpine
 docker run -d --name cache -v cache_data:/data redis:alpine
-docker run -d --name app -p 3000:3000 -e DB_HOST=cache --network app-net --depends-on cache node:20-alpine
+docker run -d --name app -p 3000:3000 -e DB_HOST=cache --network app-net node:20-alpine
+# ...e esta terceira linha só pode rodar DEPOIS das outras duas:
+# o `docker run` não tem nenhuma opção para declarar dependências.
 ```
 
 🗣️ **Pergunte à turma:**
@@ -37,11 +39,11 @@ Antes de escrever, mostre a tradução exata. Cole isso no slide/README:
 | `-v ./html:/path` | `volumes: ["./html:/path"]` | Bind Mount |
 | `-v cache_data:/path` | `volumes: ["cache_data:/path"]` | Named Volume |
 | `--network app-net` | `networks: ["app-net"]` | Anexa à rede |
-| `--depends-on cache` | `depends_on: [cache]` | Ordem de criação |
+| _(não existe no CLI: você roda os comandos na ordem certa, à mão)_ | `depends_on: [cache]` | Ordem de criação |
 
 📌 **Regra de Ouro do Compose:**
 
-- Não use `version: "3.9"` (legado desde Compose v2).
+- Não use `version: "3.9"`: o campo é obsoleto, e o Compose v2 o ignora (e avisa).
 - O Compose **cria automaticamente** uma rede chamada `<projeto>_default`. Você só declara `networks:` se quiser isolamento extra ou nomes customizados.
 - Todos os serviços na mesma rede resolvem DNS por **nome do serviço**.
 
@@ -106,8 +108,10 @@ services:
   web:
     image: nginx:alpine
     ports:
-      - published: 8080
+      - mode: ingress
         target: 80
+        published: "8080"
+        protocol: tcp
     volumes:
       - type: bind
         source: /caminho/absoluto/para/compose-step-by-step/html
@@ -119,7 +123,7 @@ services:
 
 - Resolveu `./html` para o **caminho absoluto** do seu SO.
 - Expandiu a sintaxe curta de `ports` e `volumes` para a forma longa e explícita.
-- Adicionou automaticamente uma rede `default` (não aparece aqui, mas existe).
+- Adicionou automaticamente uma rede `default` (no fim da saída, em `networks:`, com o nome `compose-step-by-step_default`).
 
 ### 3️⃣ Levante e teste
 
@@ -171,7 +175,7 @@ volumes:
 
 📌 **Regra de Ouro do Compose:**
 
-> Se tem dois-pontos no volume (`nome:/path`), declare no bloco raiz `volumes:`. Se não tem (`./pasta:/path`), é bind mount e não precisa declarar.
+> Olhe o que vem **antes** dos dois-pontos. Se é um **nome** (`cache_data:/data`), é um named volume: declare-o no bloco raiz `volumes:`. Se é um **caminho** (`./html:/path`, começando com `.` ou `/`), é bind mount e não precisa declarar.
 
 ### 2️⃣ Valide a configuração
 
@@ -191,15 +195,14 @@ services:
         target: /data
 volumes:
   cache_data:
-    name: tutorialdocker_cache_data
-    driver: local
+    name: compose-step-by-step_cache_data
 ```
 
 🧠 **O que o Compose fez:**
 
 - Validou que `cache_data` existe na seção raiz.
 - Resolveu o caminho interno para `/data` (absoluto, como exige o daemon).
-- Prefixou o nome com o projeto (`tutorialdocker_`) para evitar colisão global.
+- Prefixou o nome com o projeto (`compose-step-by-step_`, o nome da pasta) para evitar colisão global.
 
 ### 3️⃣ Levante incrementalmente e teste
 
@@ -207,16 +210,15 @@ volumes:
 docker compose up -d
 ```
 
-📤 **Output esperado:**
+📤 **Output esperado (o formato exato varia com a versão do Compose):**
 
 ```
-[+] Running 3/3
- ✔ Network tutorialdocker_default  Created
- ✔ Volume  tutorialdocker_cache_data  Created
- ✔ Container tutorialdocker-cache-1  Started
+ ✔ Volume "compose-step-by-step_cache_data"  Created
+ ✔ Container compose-step-by-step-web-1      Running
+ ✔ Container compose-step-by-step-cache-1    Started
 ```
 
-🔍 **Note:** O Compose **não recriou** o `web`. Só criou o volume, anexou à rede e subiu o `cache`.
+🔍 **Note:** O Compose **não recriou** o `web` (ele aparece como `Running`), e a rede `compose-step-by-step_default` já existia desde o Passo 1. Só criou o volume e subiu o `cache` na mesma rede.
 
 ✅ **Teste rápido:**
 
@@ -245,7 +247,7 @@ docker compose exec cache env | grep REDIS
 
 ### 1️⃣ Prepare a estrutura
 
-Na raiz do projeto (`tutorialdocker/`), crie a pasta:
+Na raiz do projeto (`compose-step-by-step/`), crie a pasta:
 
 ```bash
 mkdir app
@@ -292,9 +294,9 @@ console.log('✅ App ouvindo em http://0.0.0.0:3000');
 console.log('🔗 DB_HOST:', process.env.DB_HOST);
 });
 
-// Mantém o processo vivo para o container não parar
-setInterval(() => {}, 1000);
 ```
+
+_(Não é preciso nenhum truque para "manter o processo vivo": enquanto o servidor estiver escutando a porta, o Node não termina.)_
 
 🔍 **Por que `'0.0.0.0'`?**Se o Node ouvir apenas `127.0.0.1` (padrão de alguns frameworks), a requisição fica presa na interface de *loopback* interna do container. `0.0.0.0` instrui o processo a escutar em **todas as interfaces de rede**, permitindo que o Docker Engine redirecione a porta do host.
 
@@ -319,7 +321,7 @@ CMD ["npm", "start"]
 
 🔍 **O que faz:**
 
-- `FROM node:20-alpine`: Imagem leve (~50MB).
+- `FROM node:20-alpine`: Imagem leve (~45 MB para baixar, bem menor que a `node:20` completa, que passa de 1 GB descompactada).
 - `COPY package*.json ./` + `RUN npm install`: Aproveita cache do Docker. Só reinstala se `package.json` mudar.
 - `CMD ["npm", "start"]`: Processo principal (`PID 1`) que mantém o container vivo.
 
@@ -376,16 +378,15 @@ docker compose config
 docker compose up -d --build
 ```
 
-📤 **Output esperado:**
+📤 **Output esperado (trecho):**
 
 ```
-[+] Running 4/4
- ✔ Network tutorialdocker_default        Created
- ✔ Volume  tutorialdocker_cache_data     Created
- ✔ Container tutorialdocker-cache-1      Started
- ✔ Container tutorialdocker-app-1        Started
- ✔ Container tutorialdocker-web-1        Started
+ ✔ Container compose-step-by-step-cache-1  Running
+ ✔ Container compose-step-by-step-web-1    Running
+ ✔ Container compose-step-by-step-app-1    Started
 ```
+
+_(Antes disso, o Compose mostra o build da imagem do `app`. Rede e volume já existiam.)_
 
 ### ✅ 4. Teste DNS Interno & Logs
 

@@ -15,7 +15,7 @@ Um projeto sem README é um projeto que ninguém consegue rodar. No mundo real, 
 **Aluno(a):** Seu Nome Completo Aqui
 
 **Tutorial original:** [Tutorial Clojure/ClojureScript: Construindo uma Aplicação
-Persistente e Reativa](https://github.com/LambdaGeo/tutoriais)
+Persistente e Reativa](https://lambdageo-edu.github.io/lambdageo-tutorials/clojure/)
 
 ## Descrição
 

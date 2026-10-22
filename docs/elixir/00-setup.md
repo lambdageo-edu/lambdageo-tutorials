@@ -40,15 +40,15 @@ O LiveView traz a **simplicidade do desenvolvimento tradicional (HTML + servidor
 
 ### 🧰 Passo 0.1: Instalar as Ferramentas
 
-Precisamos de três coisas:
+Precisamos de duas coisas:
 
-1. **Node.js** — o Phoenix o usa para compilar assets (CSS/JS);
-2. **Erlang** — a máquina virtual (BEAM) sobre a qual o Elixir roda;
-3. **Elixir** — a linguagem de programação.
+1. **Erlang** — a máquina virtual (BEAM) sobre a qual o Elixir roda;
+2. **Elixir** — a linguagem de programação.
 
-**1. Node.js:** baixe e instale a versão **LTS** no [site oficial](https://nodejs.org/).
+!!! note "E o Node.js?"
+    Desde o Phoenix 1.6, o Node.js **não é mais necessário**: os assets (JavaScript e CSS) são compilados pelos executáveis independentes do **esbuild** e do **Tailwind**, que o próprio Phoenix baixa na primeira execução. Você só vai precisar do Node se quiser instalar pacotes do npm no seu projeto.
 
-**2. Elixir e Erlang (via script oficial):** a maneira mais confiável, com controle exato das versões.
+**Elixir e Erlang (via script oficial):** a maneira mais confiável, com controle exato das versões.
 
 - **Linux/macOS (Bash):**
 
@@ -78,7 +78,6 @@ Precisamos de três coisas:
 
 ```bash
 elixir --version   # Elixir 1.17.x (compiled with Erlang/OTP 26)
-node -v            # v18 ou superior
 git --version
 ```
 

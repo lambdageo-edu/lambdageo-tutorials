@@ -71,9 +71,9 @@ Para garantir que o tutorial seja reprodutível, **fixamos todas as versões**. 
 | `seancorfield/next.jdbc`             | `1.2.659`                                 |
 | `org.xerial/sqlite-jdbc`             | `3.45.3.0`                                |
 
-> [!NOTE]
-> Em sistemas operacionais onde a ferramenta `rlwrap` não estiver instalada, o comando de atalho `clj` pode falhar com o erro: `Please install rlwrap for command editing or use "clojure" instead.`
-> Se isso acontecer no seu ambiente, basta substituir todas as chamadas a `clj` do tutorial pela palavra `clojure` (ex: use `clojure -M:run` em vez de `clj -M:run`, e `clojure` para abrir o REPL). Ambos executam exatamente a mesma engine Clojure CLI, mas o comando `clojure` funciona sem depender do editor de linha de comando `rlwrap`.
+!!! note
+    Em sistemas operacionais onde a ferramenta `rlwrap` não estiver instalada, o comando de atalho `clj` pode falhar com o erro: `Please install rlwrap for command editing or use "clojure" instead.`
+    Se isso acontecer no seu ambiente, basta substituir todas as chamadas a `clj` do tutorial pela palavra `clojure` (ex: use `clojure -M:run` em vez de `clj -M:run`, e `clojure` para abrir o REPL). Ambos executam exatamente a mesma engine Clojure CLI, mas o comando `clojure` funciona sem depender do editor de linha de comando `rlwrap`.
 
 ---
 

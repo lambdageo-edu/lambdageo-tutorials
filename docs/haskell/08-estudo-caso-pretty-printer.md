@@ -100,10 +100,10 @@ ghci> generate arbitrary :: IO [(Int,Int)]
 !!! tip
     **E os caracteres?** Quando o livro foi escrito, o QuickCheck **não tinha** uma instância padrão para `Char` — havia dúvidas sobre qual codificação usar —, e era preciso escrever uma à mão. Nas versões atuais essa instância **já existe** em `Test.QuickCheck`, e é bem mais rica que a gambiarra da época: ela gera todo o espectro Unicode, com viés para caracteres ASCII comuns e caracteres de controle (justamente os que costumam revelar bugs de escape — repare neles nas saídas a seguir). Ou seja: **não defina uma instância de `Char`**; apenas use `arbitrary`.
 
-Vamos então ao gerador para todas as variantes do tipo `Doc`. Quebramos o problema: escolhemos aleatoriamente um construtor e, dependendo dele, geramos seus campos — recursivamente, nos casos de concatenação e união. Escreveremos o código diretamente no `test/Spec.hs`, com um `main` provisório que só imprime alguns documentos gerados:
+Vamos então ao gerador para todas as variantes do tipo `Doc`. Quebramos o problema: escolhemos aleatoriamente um construtor e, dependendo dele, geramos seus campos — recursivamente, nos casos de concatenação e união. Escreveremos o código diretamente no `test/Main.hs` (substituindo o conteúdo gerado pelo `cabal init`), com um `main` provisório que só imprime alguns documentos gerados:
 
 ```haskell
--- test/Spec.hs
+-- test/Main.hs
 import Test.QuickCheck
 import Prettify
 
@@ -153,7 +153,7 @@ _(Saída ilustrativa, encurtada — a sua será diferente.)_ Examinando-a, vemos
 Essa abordagem foi bem direta, e podemos melhorá-la usando a função `oneof` (cujo tipo vimos acima) para escolher entre geradores de uma lista — e o combinador monádico `liftM` (do módulo `Control.Monad`) para evitar nomear os resultados intermediários:
 
 ```haskell
--- test/Spec.hs
+-- test/Main.hs
 instance Arbitrary Doc where
     arbitrary =
         oneof [ return Empty
@@ -164,7 +164,9 @@ instance Arbitrary Doc where
               , liftM2 Union  arbitrary arbitrary ]
 ```
 
-Esta versão é mais concisa — apenas escolhe de uma lista de geradores —, mas ambas descrevem os mesmos dados.
+Esta versão é mais concisa — apenas escolhe de uma lista de geradores —, mas ambas descrevem os mesmos dados. Para usá-la, acrescente `import Control.Monad (liftM, liftM2)` ao topo do arquivo (o `test/Main.hs` completo, mais abaixo, já traz todas as importações).
+
+_(Com o `-Wall` ativo, o GHC emite aqui alguns avisos inofensivos: `Orphan instance` — a instância `Arbitrary Doc` está num módulo diferente do tipo `Doc` —, `Pattern match(es) are non-exhaustive` no `case` da primeira versão e `Top-level binding with no type signature` nas propriedades. Nenhum impede a compilação.)_
 
 ### Testando a construção de documentos
 
@@ -184,7 +186,7 @@ x <> y = x `Concat` y
 Juntas, elas devem satisfazer uma propriedade razoável: concatenar um documento com o vazio — de qualquer lado — deve deixá-lo inalterado. (É a propriedade de **identidade** que anunciamos no "momento matemático" da Parte 1.) Podemos afirmar a invariante assim:
 
 ```haskell
--- test/Spec.hs
+-- test/Main.hs
 prop_empty_id x =
     empty <> x == x
   &&
@@ -214,10 +216,10 @@ Três detalhes fazem tudo funcionar:
 
 Há ainda um detalhe que o livro original deixou passar, e que vale corrigir: **o processo de testes precisa terminar com código de saída de erro quando algo falha**. É só o código de saída que o `cabal test` (e qualquer ferramenta de integração contínua) olha — sem isso, a suíte imprime "falhou" mas o Cabal alegremente reporta o teste como `PASS`. Resolvemos com `exitFailure`, do módulo `System.Exit`.
 
-O `test/Spec.hs` completo até aqui:
+O `test/Main.hs` completo até aqui:
 
 ```haskell
--- test/Spec.hs
+-- test/Main.hs
 {-# LANGUAGE TemplateHaskell #-}
 
 import Prelude hiding ((<>))
@@ -264,7 +266,7 @@ $ cabal test
 Running 1 test suites...
 Test suite hs2json-test: RUNNING...
 
-=== prop_empty_id from test/Spec.hs:22 ===
+=== prop_empty_id from test/Main.hs:22 ===
 +++ OK, passed 100 tests.
 
 Passou em todos os testes.
@@ -292,7 +294,7 @@ line = Line
 Escrevemos, então, os testes correspondentes — assim, modificações futuras não quebrarão estas invariantes básicas sem que a suíte grite:
 
 ```haskell
--- test/Spec.hs
+-- test/Main.hs
 prop_char c   = char c   == Char c
 prop_text s   = text s   == if null s then Empty else Text s
 prop_line     = line     == Line
@@ -317,7 +319,7 @@ hcat = fold (<>)
 Podemos testar instâncias específicas do `fold` isoladamente. A concatenação horizontal, por exemplo, é fácil de especificar escrevendo uma implementação de referência sobre listas:
 
 ```haskell
--- test/Spec.hs
+-- test/Main.hs
 prop_hcat xs = hcat xs == glue xs
     where
         glue []     = empty
@@ -327,7 +329,7 @@ prop_hcat xs = hcat xs == glue xs
 História parecida com `punctuate`, cuja inserção de pontuação parece se modelar com a intercalação de listas (`intersperse`, de `Data.List`, recebe um elemento e o intercala entre os elementos de uma lista):
 
 ```haskell
--- test/Spec.hs
+-- test/Main.hs
 prop_punctuate s xs = punctuate s xs == intersperse s xs
 ```
 
@@ -336,7 +338,7 @@ Embora pareça correta, a execução revela uma falha na nossa lógica:
 ```
 $ cabal test
 
-=== prop_punctuate from test/Spec.hs:37 ===
+=== prop_punctuate from test/Main.hs:37 ===
 *** Failed! Falsified (after 6 tests):
 Char '}'
 [Text "\DC3v\DEL~w",Concat Empty (Text "\199132\NAK")]
@@ -350,7 +352,7 @@ _(O QuickCheck moderno diz `Falsified` onde o antigo dizia `Falsifiable`. As dua
 A biblioteca **otimiza fora os documentos vazios redundantes** (lembre-se dos casos `Empty` do `<>`), algo que o modelo de lista não faz — então precisamos enriquecer o modelo para casar com a realidade. Primeiro intercalamos a pontuação e depois eliminamos os `Empty` espalhados, assim:
 
 ```haskell
--- test/Spec.hs
+-- test/Main.hs
 prop_punctuate' s xs = punctuate s xs == combine (intersperse s xs)
     where
         combine []           = []
@@ -367,25 +369,25 @@ $ cabal test
 Running 1 test suites...
 Test suite hs2json-test: RUNNING...
 
-=== prop_empty_id from test/Spec.hs:22 ===
+=== prop_empty_id from test/Main.hs:22 ===
 +++ OK, passed 100 tests.
 
-=== prop_char from test/Spec.hs:27 ===
+=== prop_char from test/Main.hs:27 ===
 +++ OK, passed 100 tests.
 
-=== prop_text from test/Spec.hs:28 ===
+=== prop_text from test/Main.hs:28 ===
 +++ OK, passed 100 tests.
 
-=== prop_line from test/Spec.hs:29 ===
+=== prop_line from test/Main.hs:29 ===
 +++ OK, passed 1 test.
 
-=== prop_double from test/Spec.hs:30 ===
+=== prop_double from test/Main.hs:30 ===
 +++ OK, passed 100 tests.
 
-=== prop_hcat from test/Spec.hs:32 ===
+=== prop_hcat from test/Main.hs:32 ===
 +++ OK, passed 100 tests.
 
-=== prop_punctuate' from test/Spec.hs:37 ===
+=== prop_punctuate' from test/Main.hs:37 ===
 +++ OK, passed 100 tests.
 
 Passou em todos os testes.
@@ -395,5 +397,5 @@ Test suite hs2json-test: PASS
 _(Curiosidade: `prop_line` não recebe argumentos, então não há o que gerar — o QuickCheck a trata como um teste único: `passed 1 test`.)_
 
 !!! tip
-    **Sobre o encolhimento (shrinking):** quando uma propriedade falha, o QuickCheck tenta **encolher** o contraexemplo — remover elementos, diminuir números — até achar o menor caso que ainda falha, o que facilita muito a depuração (você verá mensagens como `Failed! ... and 3 shrinks`). Isso funciona automaticamente para os tipos embutidos; para o nosso `Doc`, não definimos o método `shrink` da classe `Arbitrary`, então os contraexemplos vêm "crus". Implementá-lo (dica: `genericShrink`) fica como exercício.
+    **Sobre o encolhimento (shrinking):** quando uma propriedade falha, o QuickCheck tenta **encolher** o contraexemplo — remover elementos, diminuir números — até achar o menor caso que ainda falha, o que facilita muito a depuração (você verá mensagens como `Failed! ... and 3 shrinks`). Isso funciona automaticamente para os tipos embutidos — inclusive para a **lista** de `Doc` do `prop_punctuate`, que pode perder elementos. Mas cada `Doc`, individualmente, não encolhe: não definimos o método `shrink` da classe `Arbitrary` para ele. Implementá-lo (dica: `genericShrink`) fica como exercício.
 

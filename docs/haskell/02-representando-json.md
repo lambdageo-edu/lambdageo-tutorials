@@ -24,27 +24,21 @@ data JValue = JString String
 
 Para cada tipo de JSON, fornecemos um construtor de valor distinto. Alguns desses construtores possuem parâmetros: se quisermos construir uma string JSON, devemos fornecer um valor `String` como argumento para o construtor `JString`.
 
-Aqui está a versão atualizada dessa seção do tutorial, incluindo o passo crucial de registrar o novo módulo no arquivo `.cabal` antes de carregar o REPL. 
-
-Você pode substituir o parágrafo original por este bloco:
-
----
-
 Para começar a experimentar esse código, siga estes passos:
 
 1. Salve o arquivo `SimpleJSON.hs` no seu editor.
-2. **Atualize o arquivo `.cabal` do seu projeto:** como acabamos de criar um *novo arquivo* (um novo módulo), precisamos informar ao Cabal sobre sua existência. Abra o arquivo `.cabal` do seu projeto (ex: `hs2json.cabal`) e adicione `SimpleJSON` à lista de `exposed-modules` na seção `library`:
+2. **Atualize o arquivo `.cabal` do seu projeto:** como acabamos de criar um *novo arquivo* (um novo módulo), precisamos informar ao Cabal sobre sua existência. Abra o `hs2json.cabal` e adicione `SimpleJSON` à lista de `exposed-modules` da seção `library`, **antes** do `MyLib` (que ainda é usado pelo `app/Main.hs` gerado):
    ```cabal
    library
-       exposed-modules:  SimpleJSON  -- <--- Adicionado aqui
+       import:           warnings
+       exposed-modules:  SimpleJSON, MyLib
+       build-depends:    base ^>=4.17.2.0
        hs-source-dirs:   src
-       build-depends:    base >=4.14
        default-language: Haskell2010
    ```
-      *(Se você já tiver outros módulos, como `MyLib`, basta adicioná-los separados por vírgula ou em linhas novas nesta mesma lista).*
+   _(Mantenha o `build-depends` que o `cabal init` gerou: a faixa de versão do `base` depende do seu GHC.)_
+
 3. Alterne para uma janela de terminal e carregue o projeto no REPL executando o seguinte comando na raiz do projeto:
-
-
 
 ```
 $ cabal repl
@@ -52,8 +46,8 @@ Resolving dependencies...
 Build profile: -w ghc-9.4.7 -O1
 ...
 GHCi, version 9.4.7: https://www.haskell.org/ghc/  :? for help
-[1 of 2] Compiling SimpleJSON       ( src/SimpleJSON.hs, interpreted )
-[2 of 2] Compiling Main             ( app/Main.hs, interpreted )
+[1 of 2] Compiling MyLib            ( src/MyLib.hs, interpreted )
+[2 of 2] Compiling SimpleJSON       ( src/SimpleJSON.hs, interpreted )
 Ok, two modules loaded.
 ghci> JString "foo"
 JString "foo"
@@ -63,7 +57,16 @@ ghci> :type JBool True
 JBool True :: JValue
 ```
 
-_(A saída exata do cabeçalho varia com as versões, mas o prompt e o comportamento são estes.)_
+_(A saída exata do cabeçalho varia com as versões, mas o prompt e o comportamento são estes. Repare que o `cabal repl` carrega apenas a **biblioteca**; o `app/Main.hs` não entra no REPL.)_
+
+!!! tip "Avisos `-Wtype-defaults` no GHCi"
+    Como o `-Wall` vale também dentro do `cabal repl`, expressões como `truncate 5.8` vêm acompanhadas de vários avisos `Defaulting the type variable...` antes do resultado. Eles são inofensivos; para silenciá-los durante a sessão, digite `:set -Wno-type-defaults`.
+
+!!! warning "Comentários no `.cabal`"
+    No `.cabal`, um comentário (`--`) só vale **no início da linha**. Escrever `exposed-modules: SimpleJSON  -- adicionado` no fim da linha faz o Cabal recusar o arquivo com `unexpected '-'`.
+
+!!! tip "Por que `SimpleJSON` primeiro?"
+    O `cabal repl` carrega todos os módulos da lista, mas o prompt do GHCi só enxerga diretamente o **primeiro**. Com `MyLib` na frente, `JString "foo"` daria `Data constructor not in scope`. Se isso acontecer, basta digitar `import SimpleJSON` no GHCi.
 
 Podemos ver como usar um construtor para pegar um valor Haskell normal e transformá-lo em um `JValue`. Para fazer o inverso, usamos casamento de padrões. Aqui está uma função que podemos adicionar ao `SimpleJSON.hs`, que irá extrair uma string de um valor JSON para nós. Se o valor JSON realmente contiver uma string, nossa função envolverá a string com o construtor `Just`. Caso contrário, retornará `Nothing`.
 
@@ -78,7 +81,7 @@ Quando salvamos o arquivo de código-fonte modificado, podemos recarregá-lo no 
 
 ```
 ghci> :r
-[1 of 2] Compiling SimpleJSON       ( src/SimpleJSON.hs, interpreted )
+[2 of 2] Compiling SimpleJSON       ( src/SimpleJSON.hs, interpreted )
 Ok, two modules loaded.
 ghci> getString (JString "hello")
 Just "hello"
@@ -86,7 +89,7 @@ ghci> getString (JNumber 3)
 Nothing
 ```
 
-A seguir, mais algumas funções acessoras. Desta vez incluímos as assinaturas de tipo — o GHC as infere sozinho, mas escrevê-las é uma boa prática (e, quando ativarmos `-Wall` no `.cabal`, mais adiante, o GHC vai nos lembrar disso com um aviso caso esqueçamos):
+A seguir, mais algumas funções acessoras. Desta vez incluímos as assinaturas de tipo — o GHC as infere sozinho, mas escrevê-las é uma boa prática (e, como o `-Wall` já está ativo no `.cabal`, o GHC nos lembra disso com um aviso `-Wmissing-signatures` caso esqueçamos):
 
 ```haskell
 -- src/SimpleJSON.hs
@@ -172,10 +175,11 @@ Para compilar o projeto e executar o binário, na raiz do projeto:
 ```
 $ cabal build
 $ cabal run
+Hello, Haskell!
 someFunc
 ```
 
-_(O `someFunc` vem do `src/MyLib.hs` gerado pelo assistente do `cabal init` — é o "hello world" do esqueleto.)_
+_(As duas linhas vêm do esqueleto gerado pelo `cabal init`: a primeira, do `app/Main.hs`; a segunda, da função `someFunc` do `src/MyLib.hs`.)_
 
 Agora que compilamos com sucesso nossa biblioteca mínima, vamos começar a escrever a biblioteca proposta aqui. Antes de seguir, **apague o arquivo `src/MyLib.hs`**, já que não o usaremos mais, e então modifique o `app/Main.hs`:
 
@@ -190,12 +194,13 @@ main = print (JObject [("foo", JNumber 1), ("bar", JBool False)])
 ```
 
 !!! warning
-    **Diferente do fluxo com hpack: aqui você precisa editar o `.cabal` à mão.** Sem essa camada de conveniência, o Cabal não descobre `SimpleJSON.hs` sozinho — é preciso trocar `MyLib` por `SimpleJSON` (e remover a referência a `MyLib`) na lista `exposed-modules:` da seção `library` do `hs2json.cabal`:
+    **Diferente do fluxo com hpack: aqui você precisa editar o `.cabal` à mão.** Como apagamos o `MyLib.hs`, é preciso **remover** `MyLib` da lista `exposed-modules:` da seção `library` do `hs2json.cabal` — senão o `cabal build` reclama que não encontra o módulo:
     ```cabal
     library
+        import:           warnings
         exposed-modules:  SimpleJSON
+        build-depends:    base ^>=4.17.2.0
         hs-source-dirs:   src
-        build-depends:    base >=4.14
         default-language: Haskell2010
     ```
     A partir de agora, **todo módulo novo que criarmos em `src/` precisa entrar nessa lista** — é o preço de não ter o hpack detectando por nós. Em compensação, o arquivo `.cabal` é sempre exatamente o que está sendo compilado, sem uma etapa de geração no meio.

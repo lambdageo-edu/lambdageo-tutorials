@@ -77,7 +77,7 @@ end
 ```
 
 !!! tip
-    Essa lista `children` é a **árvore de supervisão** — um dos superpoderes do Elixir. Cada item é um processo que a aplicação inicia e vigia. Se o Repo travar, o supervisor o reinicia automaticamente. É o mesmo mecanismo que "ressuscitou" nosso LiveView na Fase 2!
+    Essa lista `children` é a **árvore de supervisão** — um dos superpoderes do Elixir. Cada item é um processo que a aplicação inicia e vigia. Se o Repo travar, o supervisor o reinicia automaticamente. (O LiveView da Fase 2 voltou por outro caminho: lá foi o navegador que reconectou e criou um processo novo. Mas a ideia é a mesma: a falha de um processo não derruba o resto.)
 
 
 **Ação 3:** por fim, configure o Repo no arquivo `config/config.exs`. Adicione (por exemplo, logo após a linha `import Config` no topo):
@@ -139,7 +139,7 @@ defmodule ElixirTodoList.Repo.Migrations.CreateTasksTable do
       add :title, :string
       add :completed, :boolean, default: false
 
-      timestamps() # Adiciona as colunas inserted_at e updated_at
+      timestamps(type: :utc_datetime) # Adiciona as colunas inserted_at e updated_at
     end
   end
 end
@@ -172,6 +172,9 @@ Para conectar o código à tabela recém-criada, precisamos de três peças:
 ### 🧩 Passo 3.6: Criar o Schema `Task`
 
 Crie o arquivo `lib/elixir_todo_list/task.ex`:
+
+!!! warning "`ElixirTodoList.Task` não é o `Task` do Elixir"
+    O Elixir já tem um módulo `Task` (para tarefas assíncronas, como `Task.async`). Nosso schema se chama `ElixirTodoList.Task`, então não há conflito — mas, nos arquivos onde escrevermos `alias ElixirTodoList.Task`, o nome curto `Task` passa a significar **o nosso schema**, e o `Task` do Elixir fica inacessível pelo nome curto. Neste projeto não usamos o `Task.async`, então tudo funciona; em projetos maiores, prefira um nome sem ambiguidade (como `Todo` ou `TaskItem`).
 
 ```elixir
 defmodule ElixirTodoList.Task do

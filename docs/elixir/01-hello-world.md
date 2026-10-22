@@ -172,7 +172,7 @@ use ElixirTodoListWeb, :live_view
 
 O marcador `@impl true` vem antes de funções que **implementam callbacks** de um **comportamento** (_behaviour_). Um _behaviour_ em Elixir é parecido com uma **interface** em linguagens orientadas a objetos: ele define **quais funções um módulo deve implementar**.
 
-O LiveView espera que cada módulo tenha, no mínimo, `mount/3` e `render/1`. Quando você escreve `@impl true`, está dizendo ao compilador: _"esta função é a implementação esperada pelo comportamento do LiveView"_.
+O comportamento do LiveView define callbacks como `mount/3`, `render/1` e `handle_event/3` (o `mount/3` é opcional; o `render/1` só pode faltar se houver um arquivo de template `.html.heex` ao lado do módulo). Quando você escreve `@impl true`, está dizendo ao compilador: _"esta função é a implementação esperada pelo comportamento do LiveView"_.
 
 | Linguagem  | Anotação equivalente | Finalidade                                                     |
 | ---------- | -------------------- | -------------------------------------------------------------- |

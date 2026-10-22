@@ -18,7 +18,7 @@ Se precisar usar PowerShell, substitua `curl -sI` por `Invoke-WebRequest -Uri ht
 
 ---
 
-### 🔍 1. Portas (`p`): Mapeamento Host ↔ Container
+### 🔍 1. Portas (`-p`): Mapeamento Host ↔ Container
 
 **O que o `-p` realmente faz?**
 
@@ -82,7 +82,7 @@ curl -sI http://localhost:8080 | head -n 1
 
 ---
 
-### 🔍 2. Variáveis de Ambiente (`e`): Injeção ≠ Configuração
+### 🔍 2. Variáveis de Ambiente (`-e`): Injeção ≠ Configuração
 
 **O que o `-e` realmente faz?**
 
@@ -160,7 +160,7 @@ AUTH failed: WRONGPASS invalid username-password pair or user is disabled.
 
 ---
 
-### 🔍 3. Redes & DNS Interno (`-network`): Service Discovery Manual
+### 🔍 3. Redes & DNS Interno (`--network`): Service Discovery Manual
 
 **Como os containers se comunicam entre si?**
 
@@ -244,9 +244,10 @@ docker exec worker ping -c 2 api
 
 **Regra de Ouro:** `logs` primeiro → `ps` depois → `exec` por último. Nunca tente adivinhar; deixe o container te dizer o que está errado.
 
-⚠️ **Antes de continuar:** o container `web` foi parado lá na seção 1 (passo 3) e nunca voltou a rodar. Religue-o para os exemplos abaixo funcionarem como documentado:
+⚠️ **Antes de continuar:** o container `web` foi parado lá na seção 1 (passo 3) e nunca voltou a rodar. E a porta 8080 que ele usava ficou com o `web2`. Remova o `web2` e religue o `web` para os exemplos abaixo funcionarem como documentado:
 
 ```bash
+docker rm -f web2   # libera a porta 8080
 docker start web
 docker ps | grep web  # → confirme STATUS "Up"
 ```
@@ -270,7 +271,7 @@ docker inspect web --format='{{.NetworkSettings.Ports}}'
 # 4. Terminal cirúrgico dentro do container
 docker exec -it web sh
 # → Você está DENTRO do container. Teste manualmente:
-#    curl localhost, cat /etc/hosts, ping api, etc.
+#    wget -qO- localhost, cat /etc/hosts, etc.
 # → Digite 'exit' para sair.
 
 # 5. Ciclo de vida limpo
@@ -307,17 +308,20 @@ docker stop web && docker rm web
     ```bash
     docker exec -it worker sh
     # Dentro do container:
-    ping api          # ✅ Resolve via DNS interno
-    curl http://api   # ✅ Acessa o Nginx do outro container
+    ping -c 2 api           # ✅ Resolve via DNS interno
+    wget -qO- http://api    # ✅ Acessa o Nginx do outro container
     exit
     ```
+
+    _(A imagem `alpine` não traz o `curl`; o `wget` do BusyBox, que já vem nela, faz o mesmo papel aqui.)_
     
 4. **Limpeza segura:**
     
     ```bash
     docker system df            # Espaço usado por Docker
-    docker system prune -f      # Remove containers/imagens/networks órfãos (seguro)
-    # ⚠️ Nunca use 'prune -a' em produção: remove TUDO não usado, incluindo imagens em uso.
+    docker system prune -f      # Remove containers parados, redes sem uso, imagens "dangling" e cache de build
+    # ⚠️ Cuidado com 'prune -a': ele remove também TODAS as imagens que não estão em uso
+    #    por nenhum container — depois, tudo precisa ser baixado/construído de novo.
     ```
     
 
@@ -339,10 +343,12 @@ docker stop web && docker rm web
 
 ### 🧹 Limpeza Antes de Continuar
 
-Este bloco criou vários containers e uma rede (`web`, `web2`, `internal`, `db`, `cache`, `cache2`, `svc-a`, `svc-b`, `api`, `worker`, `bad`, `app-net`). Antes de seguir para o próximo capítulo, limpe tudo para começar do zero e evitar conflitos de porta ou nome:
+Este bloco criou vários containers e uma rede (`web`, `web2`, `internal`, `db`, `cache`, `cache2`, `svc-a`, `svc-b`, `api`, `worker`, `bad`, `app-net`). Antes de seguir para o próximo capítulo, remova-os para começar do zero e evitar conflitos de porta ou nome:
 
 ```bash
-docker rm -f $(docker ps -aq)
+docker rm -f web web2 internal db cache cache2 svc-a svc-b api worker bad
 docker network rm app-net
 ```
+
+_(Evite o atalho `docker rm -f $(docker ps -aq)`: ele apaga **todos** os containers da máquina, inclusive os de outros projetos seus.)_
 >

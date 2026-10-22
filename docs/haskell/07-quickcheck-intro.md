@@ -12,17 +12,12 @@ Neste capítulo, veremos como usar o QuickCheck para estabelecer invariantes no 
 
 ## Preparando o projeto
 
-Se você acabou de concluir a Parte 1, já tem tudo pronto — basta continuar no diretório `hs2json`. Caso contrário, clone a biblioteca:
+Esta parte continua no mesmo diretório `hs2json` da Parte 1 — é pré-requisito tê-la concluído.
 
-```bash
-git clone https://github.com/profsergiocosta/hs2json.git
-cd hs2json
-```
-
-Agora, execute a suíte de testes:
+Execute a suíte de testes. A opção `--test-show-details=direct` faz o Cabal mostrar no terminal tudo o que a suíte imprime (sem ela, a saída de uma suíte que **passa** só vai para um arquivo de log):
 
 ```
-$ cabal test
+$ cabal test --test-show-details=direct
 ```
 
 Após a compilação, aparecerá a informação de que ainda não existem testes implementados:
@@ -30,22 +25,27 @@ Após a compilação, aparecerá a informação de que ainda não existem testes
 ```
 Running 1 test suites...
 Test suite hs2json-test: RUNNING...
-Test suite not yet implemented
+Test suite not yet implemented.
 Test suite hs2json-test: PASS
 ```
 
-Podemos confirmar no código-fonte que nenhum teste foi implementado — este é o `test/Spec.hs` que o `cabal init` gerou:
+Podemos confirmar no código-fonte que nenhum teste foi implementado — este é o `test/Main.hs` que o `cabal init` gerou:
 
 ```haskell
--- test/Spec.hs
+-- test/Main.hs
+module Main (main) where
+
 main :: IO ()
-main = putStrLn "Test suite not yet implemented"
+main = putStrLn "Test suite not yet implemented."
 ```
 
 O objetivo deste capítulo é implementar esses testes.
 
 !!! tip
-    **Nota do professor:** a implementação final deste capítulo fica guardada em um repositório separado (`hs2json-test`), para que vocês possam usá-lo como referência se algo der errado. Porém, é importante que **executem os passos a seguir** a partir do repositório _sem_ os testes — o aprendizado está no caminho, não no destino.
+    Para não precisar digitar `--test-show-details=direct` toda vez, crie na raiz do projeto um arquivo `cabal.project.local` com a linha `test-show-details: direct`. Nos exemplos a seguir, omitimos a opção.
+
+!!! tip
+    **Nota do professor:** a versão completa do projeto, com todos os testes destas duas partes, está em [lambdageo-edu/hs2json](https://github.com/lambdageo-edu/hs2json), para servir de referência se algo der errado (lá, o arquivo de testes se chama `test/Spec.hs`, e o executável, `hs2json-exe`). Porém, é importante que **executem os passos a seguir** no seu próprio projeto — o aprendizado está no caminho, não no destino.
 
 ### Adicionando o QuickCheck às dependências
 
@@ -53,18 +53,25 @@ O QuickCheck não faz parte do `base`, então precisamos declará-lo no `hs2json
 
 ```cabal
 library
+    import:           warnings
     exposed-modules:  SimpleJSON, PutJSON, Prettify, PrettyJSON, QuickTestes
+    build-depends:    base ^>=4.17.2.0, QuickCheck
     hs-source-dirs:   src
-    build-depends:    base >=4.14, QuickCheck
     default-language: Haskell2010
 
 test-suite hs2json-test
-    type:             exitcode-stdio-1.0
-    main-is:          Spec.hs
-    hs-source-dirs:   test
-    build-depends:    base >=4.14, hs2json, QuickCheck
+    import:           warnings
     default-language: Haskell2010
+    type:             exitcode-stdio-1.0
+    hs-source-dirs:   test
+    main-is:          Main.hs
+    build-depends:
+        base ^>=4.17.2.0,
+        hs2json,
+        QuickCheck
 ```
+
+Repare que já incluímos o `QuickTestes` em `exposed-modules`: é o módulo que vamos criar a seguir.
 
 No próximo `cabal build` (ou `cabal test`, ou `cabal repl`), o Cabal baixa e compila o QuickCheck automaticamente — é a mágica das dependências explícitas que discutimos na Parte 1.
 
@@ -103,10 +110,11 @@ Uma invariante útil para começar — e que aparece com frequência em código 
 prop_idempotent xs = qsort (qsort xs) == qsort xs
 ```
 
-Usaremos a convenção do QuickCheck de prefixar as propriedades com `prop_`, para diferenciá-las do código normal. A propriedade de idempotência é só uma função Haskell declarando uma igualdade que deve valer para qualquer entrada. Podemos checar manualmente que ela faz sentido para alguns casos:
+Usaremos a convenção do QuickCheck de prefixar as propriedades com `prop_`, para diferenciá-las do código normal. A propriedade de idempotência é só uma função Haskell declarando uma igualdade que deve valer para qualquer entrada. Podemos checar manualmente que ela faz sentido para alguns casos. Como no capítulo do `Prettify`, usamos `:module *` para entrar no módulo (o prompt do `cabal repl` só enxerga o primeiro módulo da lista):
 
 ```
 $ cabal repl
+ghci> :module *QuickTestes
 ghci> prop_idempotent []
 True
 ghci> prop_idempotent [1,1,1,1]
@@ -176,7 +184,7 @@ ghci> quickCheck (prop_minimum :: [Integer] -> Bool)
 Exception:
   Prelude.head: empty list
   ...
-  head, called at src/QuickTestes.hs:15:19 in main:QuickTestes
+  head, called at src/QuickTestes.hs:15:19 in hs2json-0.1.0.0-inplace:QuickTestes
 []
 ```
 

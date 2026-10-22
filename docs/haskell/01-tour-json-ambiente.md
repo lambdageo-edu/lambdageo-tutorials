@@ -71,17 +71,38 @@ mkdir hs2json && cd hs2json
 cabal init --interactive
 ```
 
-Ele faz uma série de perguntas — nome do pacote (`hs2json`), versão, se você quer uma biblioteca, um executável e uma suíte de testes (responda **3* para ele incluir executavel e biblioteca), licença, linguagem. Ao final, a estrutura gerada é:
+Ele faz uma série de perguntas — nome do pacote (`hs2json`), versão, o que o pacote vai construir (responda **3**, *Library and Executable*, para incluir biblioteca e executável), se deve gerar uma suíte de testes (responda **sim**: vamos usá-la na Parte 2), licença, linguagem. Ao final, a estrutura gerada é:
 
 ```
 hs2json/
 ├── hs2json.cabal     👈 a descrição do pacote (nome, versão, dependências, módulos)
+├── CHANGELOG.md
 ├── src/
 │   └── MyLib.hs       👈 a biblioteca (código reutilizável)
 ├── app/
-│   └── Main.hs         👈 o executável (o programa em si)
-
+│   └── Main.hs        👈 o executável (o programa em si)
+└── test/
+    └── Main.hs        👈 a suíte de testes (ainda vazia)
 ```
+
+Abra o `hs2json.cabal` e repare em dois detalhes que usaremos ao longo do tutorial:
+
+```cabal
+common warnings
+    ghc-options: -Wall
+
+library
+    import:           warnings
+    exposed-modules:  MyLib
+    ...
+
+executable hs2json
+    import:           warnings
+    ...
+```
+
+- A seção `common warnings` liga a flag **`-Wall`** (todos os avisos do GHC), e cada componente a importa com `import: warnings`. Ou seja: **os avisos já estão ativos desde o início** — veremos vários deles, e eles não impedem a compilação.
+- O executável se chama `hs2json` (o mesmo nome do pacote), e a lista `exposed-modules:` da biblioteca começa só com `MyLib`.
 
 !!! tip
     **Sem `package.yaml`:** o `.cabal` é o único arquivo de configuração — sem a camada `package.yaml`/hpack de outras ferramentas. Isso tem um efeito prático importante: **o Cabal não detecta módulos novos sozinho**. Quando criarmos `SimpleJSON.hs`, `Prettify.hs` etc. dentro de `src/`, precisaremos adicionar cada um à lista `exposed-modules:` do `hs2json.cabal` manualmente — veremos isso já no próximo capítulo.

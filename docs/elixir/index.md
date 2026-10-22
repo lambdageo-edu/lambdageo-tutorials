@@ -38,7 +38,7 @@ Para que o tutorial seja reprodutível, estas são as versões de referência:
 | ----------------------- | --------- |
 | Erlang/OTP              | 26+       |
 | Elixir                  | 1.17+     |
-| Node.js                 | 18+ (LTS) |
+| Node.js                 | opcional (só se você for usar pacotes npm) |
 | Phoenix (`phx_new`)     | 1.8.x     |
 | Phoenix LiveView        | 1.1.x     |
 | `ecto_sql`              | ~> 3.10   |
@@ -54,7 +54,7 @@ Para que o tutorial seja reprodutível, estas são as versões de referência:
 
 | Aspecto      | Clojure                                  | Elixir                                            |
 | ------------ | ---------------------------------------- | ------------------------------------------------- |
-| Paradigma    | Funcional puro (imutabilidade explícita) | Funcional concorrente (processos leves)           |
+| Paradigma    | Funcional dinâmico na JVM (imutabilidade por padrão, estado via `atom`) | Funcional concorrente (processos leves)           |
 | Renderização | Frontend reativo com Reagent (React)     | LiveView (renderização no servidor em tempo real) |
 | Comunicação  | API REST + JSON                          | Canal WebSocket interno (phx)                     |
 | Persistência | next.jdbc + SQLite                       | Ecto + SQLite                                     |

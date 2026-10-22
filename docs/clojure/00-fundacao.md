@@ -17,11 +17,11 @@ node -v               # Precisa ser 18 ou superior
 git --version         # Qualquer versão recente
 ```
 
-> [!NOTE]
-> **Sobre o clj vs. clojure:**
-> O utilitário `clj` é apenas um script wrapper que tenta executar o Clojure em conjunto com a ferramenta de edição de linha de comando `rlwrap`. Em alguns sistemas, se o `rlwrap` não estiver instalado, rodar `clj` resultará em um erro como:
-> `Please install rlwrap for command editing or use "clojure" instead.`
-> Se for o seu caso, não se preocupe! Você não precisa instalar nada a mais. Basta usar o comando `clojure` no lugar de `clj` em todo este tutorial (ex: `clojure --version` para testar a versão, `clojure -M:run` para rodar o backend e `clojure` para REPL). Ambos executam exatamente o mesmo compilador.
+!!! note
+    **Sobre o clj vs. clojure:**
+    O utilitário `clj` é apenas um script wrapper que tenta executar o Clojure em conjunto com a ferramenta de edição de linha de comando `rlwrap`. Em alguns sistemas, se o `rlwrap` não estiver instalado, rodar `clj` resultará em um erro como:
+    `Please install rlwrap for command editing or use "clojure" instead.`
+    Se for o seu caso, não se preocupe! Você não precisa instalar nada a mais. Basta usar o comando `clojure` no lugar de `clj` em todo este tutorial (ex: `clojure --version` para testar a versão, `clojure -M:run` para rodar o backend e `clojure` para REPL). Ambos executam exatamente o mesmo compilador.
 
 **Resultado Esperado:** Cada comando deve imprimir uma versão. Se algum deles der `command not found`:
 
@@ -157,7 +157,7 @@ git commit -m "feat: setup inicial do projeto com .gitignore"
 
 ```
 [main (root-commit) a1b2c3d] feat: setup inicial do projeto com .gitignore
- 1 file changed, 40 insertions(+)
+ 1 file changed, 41 insertions(+)
  create mode 100644 .gitignore
 ```
 

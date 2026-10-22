@@ -123,7 +123,7 @@ WORKDIR /app
 
 # Copia apenas manifestos para instalar só produção
 COPY package*.json ./
-RUN npm install --only=production && npm cache clean --force
+RUN npm install --omit=dev && npm cache clean --force
 
 # Copia apenas o código compilado do estágio anterior
 COPY --from=builder /app/dist ./dist
@@ -141,7 +141,7 @@ CMD ["node", "dist/index.js"]
 
 | Métrica | Dockerfile Simples | Multi-Stage |
 | --- | --- | --- |
-| Tamanho da imagem | ~300 MB | ~50 MB |
+| Tamanho da imagem | base + todas as dependências + fontes | base + só dependências de produção + `dist/` |
 | Contém código fonte? | ✅ Sim | ❌ Não |
 | Contém devDependencies? | ✅ Sim | ❌ Não |
 | Contém ferramentas de build? | ✅ Sim | ❌ Não |
@@ -236,7 +236,7 @@ services:
       - /app/node_modules         # Preserva node_modules do container
     environment:
       - NODE_ENV=development
-      - WATCHPACK_POLLING=true    # Necessário em WSL2/macOS
+      - CHOKIDAR_USEPOLLING=true  # Polling de arquivos (útil em WSL2/macOS)
     command: ["npm", "run", "dev"]  # Override: roda nodemon
     healthcheck:
       disable: true  # Desabilita em dev para iteração rápida
@@ -271,7 +271,9 @@ COPY . .
 EXPOSE 3000
 
 # Nodemon reinicia ao detectar mudanças
-CMD ["nodemon", "--watch", ".", "--ext", "js,json", "index.js"]
+# (-L = "legacy watch", polling: necessário quando o bind mount
+#  não propaga eventos de arquivo, como em WSL2/macOS)
+CMD ["nodemon", "-L", "--watch", ".", "--ext", "js,json", "index.js"]
 ```
 
 ---
@@ -348,6 +350,8 @@ APP_VERSION=1.0.0-abc123
 
 ### Como usar:
 
+Por padrão, o Compose lê o `.env` da pasta do projeto. Se quiser valores diferentes por ambiente, crie cópias com outros nomes (por exemplo, `.env.dev` e `.env.prod`, ambas fora do Git) e escolha uma com `--env-file`:
+
 ```bash
 # Desenvolvimento
 docker compose --env-file .env.dev -f docker-compose.yml -f docker-compose.dev.yml up -d
@@ -361,7 +365,7 @@ export DB_PASSWORD=... && docker compose up -d
 
 📌 **Nunca commitar `.env` com segredos.** Use:
 
-- `.gitignore`: `.env`, `.local`, `secrets/`
+- `.gitignore`: `.env`, `.env.*` (exceto o `.env.example`), `secrets/`
 - CI/CD: secrets do GitHub Actions, GitLab CI, etc.
 - Produção: Docker Secrets, HashiCorp Vault, AWS Secrets Manager.
 
@@ -385,7 +389,8 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml build app
 
 # 5. Compare tamanhos de imagem
 docker images | grep app
-# → dev: ~300MB (com ferramentas) | prod: ~50MB (multi-stage)
+# → a de dev é maior (devDependencies, nodemon, código-fonte);
+#   a de prod tem só o `dist/` e as dependências de produção
 ```
 
 ---
@@ -397,10 +402,10 @@ docker images | grep app
 | `COPY package*.json` antes de `COPY . .` | Cache de dependências não invalida com mudanças de código | Build 10x mais rápido em dev |
 | `.dockerignore` | Evita enviar lixo para o daemon, reduz contexto | Build mais rápido + segurança |
 | `RUN` combinado com `&&` | Reduz número de camadas | Imagem menor, mais limpa |
-| `--only=production` no `npm install` | Não instala devDependencies | Imagem menor, menos vulnerabilidades |
+| `--omit=dev` no `npm install` | Não instala devDependencies (substitui o antigo `--only=production`) | Imagem menor, menos vulnerabilidades |
 | `USER node` (não-root) | Segurança: limita danos se o container for comprometido | Hardening básico |
-| Multi-stage builds | Separa build de runtime | Imagem final 80% menor |
-| `:cached` em bind mounts (macOS/Windows) | Otimiza performance de leitura do host | Hot reload mais responsivo |
+| Multi-stage builds | Separa build de runtime | Imagem final sem ferramentas de build nem código-fonte |
+| `:cached` em bind mounts (macOS) | Dica de desempenho das versões antigas do Docker Desktop (as atuais a ignoram) | Inofensivo |
 | `healthcheck` + `condition: service_healthy` | Garante ordem real de prontidão | Evita erros de conexão no startup |
 | `read_only: true` + `cap_drop: ALL` | Princípio do menor privilégio | Reduz superfície de ataque |
 

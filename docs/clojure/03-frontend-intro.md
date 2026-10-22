@@ -266,8 +266,11 @@ Vamos provar isso com um contador.
 **Ação 2 (Teste):**
 
 1. Salve o arquivo. O shadow-cljs (Terminal 2) recompila sozinho.
-2. Vá ao navegador em `http://localhost:8000`.
+2. Vá ao navegador em `http://localhost:8000` e **recarregue a página (F5)**.
 3. **Teste a mágica:** clique nos botões. O número muda instantaneamente, sem recarregar a página.
+
+!!! tip "Por que o F5?"
+    O shadow-cljs recompila e recarrega o código a cada salvamento, mas a nossa `init` só roda quando a página carrega — e é ela que monta o componente na tela. Por isso, sempre que **substituirmos o componente principal** (como agora e nos próximos passos), recarregue a página. Há outro motivo: o `defonce` preserva o valor do `app-state` entre recompilações. Sem o F5, o próximo passo herdaria o contador (`0`) como estado, em vez do mapa novo.
 
 **A lição:** você acabou de aprender o "coração" do Reagent: `(defonce app-state (r/atom ...))` (o cérebro), `@app-state` (leitura) e `swap!`/`reset!` (escrita).
 
@@ -322,7 +325,7 @@ Vamos provar isso com um contador.
     **O que é o `^{:key ...}`?** Quando renderizamos uma lista com `for`, o React precisa de uma "identidade" para cada item, para saber o que mudou entre uma renderização e outra. O metadado `^{:key (:id todo)}` fornece essa identidade. Sem ele, o console mostra o aviso *"Every element in a seq should have a unique :key"*. **Guarde esse detalhe: ele vai reaparecer na Fase 5.**
 
 
-**Teste:** salve e veja no navegador. Você deve ver a UI completa, com os dois todos falsos listados. O campo e o botão estão lá, mas clicar não faz nada.
+**Teste:** salve e recarregue o navegador (F5). Você deve ver a UI completa, com os dois todos falsos listados. O campo e o botão estão lá, mas clicar não faz nada.
 
 ### Passo 3.8: Conectando a UI ao `r/atom` (Tornando Interativo)
 
@@ -460,7 +463,7 @@ _Para esta versão (limpa e interativa):_
 ### Teste (A "Lição")
 
 1. Salve o `core.cljs`. O shadow-cljs recompila.
-2. Vá ao navegador em `http://localhost:8000`.
+2. Vá ao navegador em `http://localhost:8000` e recarregue (F5): o `defonce` do contador ainda guardava o número `0`, e o novo `app-state` precisa começar do zero como um mapa.
 
 **Teste a interatividade:**
 

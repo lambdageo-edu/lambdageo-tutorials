@@ -4,7 +4,7 @@
 
 Quando precisamos imprimir uma string, o JSON impõe regras de escape moderadamente complexas que devemos seguir. No nível mais alto, uma string é apenas uma série de caracteres entre aspas.
 
-Estas funções fazem parte do **renderizador**, então vão em `PrettyJSON.hs`:
+Estas funções fazem parte do **renderizador**, então vão em `PrettyJSON.hs`. Como agora vamos escrever a `string` **de verdade** no `PrettyJSON`, **apague o esboço de `string`** que deixamos no `Prettify.hs` no capítulo anterior — senão o GHC reclama de `Ambiguous occurrence 'string'`:
 
 ```haskell
 -- src/PrettyJSON.hs
@@ -130,6 +130,15 @@ hexEscape c | d < 0x10000 = smallHex d
   where d = ord c
 ```
 
+Antes de compilar, acrescente ao topo do `PrettyJSON.hs` (logo abaixo das importações que já existem) os três módulos padrão que usamos: `showHex`, `shiftR`/`(.&.)` e `ord`. Sem eles, o GHC aponta `Variable not in scope` para cada um:
+
+```haskell
+-- src/PrettyJSON.hs
+import Numeric (showHex)
+import Data.Char (ord)
+import Data.Bits (shiftR, (.&.))
+```
+
 Ok, agora pode compilar:
 
 ```
@@ -220,7 +229,7 @@ Exportamos apenas uma função deste módulo: `renderJValue`, nossa função de 
 Sobre as importações: os módulos `Numeric`, `Data.Char` e `Data.Bits` são distribuídos junto com o GHC (no pacote `base`). Nós mesmos escrevemos o `SimpleJSON` e preenchemos o `Prettify` com definições esqueléticas. Note que não há diferença alguma na forma de importar módulos padrão e módulos que escrevemos.
 
 !!! tip
-    O livro original também importava `compact` e `pretty` neste cabeçalho. Não faça isso: essas funções serão **usadas por quem chama** o `PrettyJSON` (nós, no GHCi), não por ele — e o GHC moderno, com o `-Wall` que vamos ativar no `.cabal`, reclamaria (com razão) de importação não utilizada.
+    O livro original também importava `compact` e `pretty` neste cabeçalho. Não faça isso: essas funções serão **usadas por quem chama** o `PrettyJSON` (nós, no GHCi), não por ele — e o GHC moderno, com o `-Wall` que o `cabal init` já deixou ativo no `.cabal`, reclamaria (com razão) de importação não utilizada.
 
 Em cada diretiva `import` listamos explicitamente os nomes que queremos trazer para o escopo. Isso não é obrigatório — omitindo a lista, todos os nomes exportados ficam disponíveis —, mas é geralmente uma boa ideia:
 

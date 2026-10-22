@@ -14,7 +14,24 @@ Com o Cabal, obter os dados de cobertura é uma flag a mais:
 $ cabal test --enable-coverage
 ```
 
-A suíte executa normalmente (todas as propriedades passando, como antes) e, ao final, o Cabal grava o relatório e os arquivos HTML gerados dentro de `dist-newstyle/`:
+A suíte executa normalmente (todas as propriedades passando, como antes) e, ao final, o Cabal grava os dados de cobertura e gera as páginas HTML dentro de `dist-newstyle/`, avisando onde elas estão:
+
+```
+Writing: hs2json-0.1.0.0-inplace/Prettify.hs.html
+Writing: hpc_index.html
+...
+Test coverage report written to
+.../dist-newstyle/build/x86_64-linux/ghc-9.4.7/hs2json-0.1.0.0/hpc/vanilla/html/hs2json-test/hpc_index.html
+```
+
+Abra o `hpc_index.html` indicado no navegador para a versão visual. Para ver o **resumo em texto** no terminal, use o utilitário `hpc` que vem com o GHC, apontando para os dados que o Cabal gravou (o caminho muda conforme a versão do GHC):
+
+```bash
+B=dist-newstyle/build/x86_64-linux/ghc-9.4.7/hs2json-0.1.0.0/hpc/vanilla
+hpc report $B/tix/hs2json-test/hs2json-test.tix \
+    --hpcdir=$B/mix/hs2json-0.1.0.0 --hpcdir=$B/mix/hs2json-test \
+    --include=hs2json-0.1.0.0-inplace:Prettify
+```
 
 ```
  19% expressions used (30/154)
@@ -25,15 +42,12 @@ A suíte executa normalmente (todas as propriedades passando, como antes) e, ao 
  23% alternatives used (8/34)
   0% local declarations used (0/4)
  45% top-level declarations used (10/22)
-
-The coverage report for hs2json's test-suite "hs2json-test" is available at
-.../dist-newstyle/build/x86_64-linux/ghc-9.4.7/hs2json-0.1.0.0/hpc/vanilla/html/hs2json-test/hpc_index.html
 ```
 
-_(Os números referem-se ao módulo `Prettify`; por padrão, o Cabal reporta a cobertura do código do **pacote** exercido pelos testes. Abra o `hpc_index.html` indicado no navegador para a versão visual.)_
+_(O `--include` restringe o relatório ao módulo `Prettify`, com o nome qualificado pelo pacote, como o Cabal o registra. Sem ele, o `hpc report` soma também o próprio módulo de testes.)_
 
 !!! tip
-    **Fluxo manual (sem Cabal nem Stack):** o HPC é do próprio GHC, então dá para reproduzir tudo na mão: compile com a flag `-fhpc`, execute o programa (o que gera um arquivo `.tix` com as contagens) e então use o utilitário `hpc`: `hpc report --hpcdir=.hpc arquivo.tix` para o resumo textual, e `hpc markup --hpcdir=.hpc arquivo.tix` para as páginas HTML. O `cabal test --enable-coverage` (ou o `stack test --coverage`, se você usa Stack) faz exatamente isso por você — mas o fluxo manual é útil quando você quer medir a cobertura de só um módulo específico, passando `--include=NomeDoModulo` ao `hpc report` (foi assim, aliás, que os números desta seção foram conferidos).
+    **Fluxo manual (sem Cabal nem Stack):** o HPC é do próprio GHC, então dá para reproduzir tudo na mão: compile com a flag `-fhpc`, execute o programa (o que gera um arquivo `.tix` com as contagens) e então use o utilitário `hpc`: `hpc report --hpcdir=.hpc arquivo.tix` para o resumo textual, e `hpc markup --hpcdir=.hpc arquivo.tix` para as páginas HTML. O `cabal test --enable-coverage` (ou o `stack test --coverage`, se você usa Stack) faz a instrumentação e gera o HTML por você; o `hpc report` acima é o mesmo utilitário, só que lendo os arquivos que o Cabal deixou em `dist-newstyle/`.
 
 ### Lendo o relatório
 
@@ -60,20 +74,21 @@ Ou seja: testamos completamente a metade **de construção** da biblioteca (`emp
 O relatório não é um fim; é o começo da próxima iteração. Vamos escrever uma propriedade que exercite a renderização — um teste baseado em modelo minúsculo para a `compact`: renderizar compactamente um documento de texto puro deve devolver a própria string:
 
 ```haskell
--- test/Spec.hs
+-- test/Main.hs
 prop_compact_text s = compact (text s) == s
 ```
 
-Rodando de novo com cobertura:
+Rodando de novo com cobertura (e o mesmo `hpc report` de antes):
 
 ```
 $ cabal test --enable-coverage
 
-=== prop_compact_text from test/Spec.hs:45 ===
+=== prop_compact_text from test/Main.hs:45 ===
 +++ OK, passed 100 tests.
 
 Passou em todos os testes.
 
+$ hpc report ...   # mesmo comando da seção anterior
  27% expressions used (42/154)
  ...
  35% alternatives used (12/34)
@@ -97,9 +112,6 @@ Uma propriedade de uma linha: expressões cobertas de 19% para **27%**, alternat
 **2.** Implemente o método `shrink` na instância `Arbitrary Doc` (investigue `genericShrink`, que exige `deriving (Generic)` no tipo) e provoque uma falha de propósito para ver o QuickCheck reduzir o contraexemplo ao mínimo.
 
 **3.** Nosso gerador de `Doc` escolhe entre os seis construtores com igual probabilidade, e os casos recursivos podem, ocasionalmente, gerar árvores enormes. Investigue as funções `sized` e `frequency` do QuickCheck e reescreva o gerador limitando a profundidade da árvore pelo "tamanho" do teste.
-
-!!! warning "Uma armadilha real, se você for além de `Doc`"
-    O `Doc` se safa relativamente bem porque `Concat`/`Union` sempre embrulham exatamente **dois** sub-`Doc`s — a recursão é binária. Se você aplicar a mesma técnica de `sized` a um tipo cuja recursão passa por **listas** (por exemplo, um `JValue` com `JObject`/`JArray`, como o do capítulo de dados JSON), tome cuidado com uma pegadinha concreta: reduzir manualmente um contador `n` a cada chamada recursiva **não** limita, sozinho, o comprimento das listas geradas por `listOf`. A função `listOf` decide quantos elementos gerar usando o parâmetro de tamanho **ambiente** do QuickCheck (que cresce a cada teste, até 100 por padrão) — não o seu `n`. O resultado é uma árvore com profundidade limitada, mas **largura ilimitada em cada nível**, que cresce exponencialmente e trava o processo (sem erro de compilação, sem teste falhando rápido — só memória subindo até a máquina matar o processo). A correção é envolver a chamada a `listOf` com `resize (n \`div\` 2)`, amarrando também o comprimento da lista ao seu contador de profundidade. Vale testar essa hipótese na prática antes de confiar num gerador recursivo que usa listas.
 
 !!! danger "Uma armadilha real, não só teórica"
     O `Doc` se safa na prática porque `Concat`/`Union` sempre embrulham exatamente **dois** sub-documentos — a recursão é binária. Se você aplicar essa mesma técnica a um tipo recursivo que guarda uma **lista** de sub-valores (por exemplo, um `JObject [(String, JValue)]` ou `JArray [JValue]`, como no projeto da Parte 1), o perigo é maior — e o sintoma é enganoso: **não é um erro de compilação nem um teste que falha rápido; é o processo simplesmente travar, consumindo memória sem fim**, porque `listOf` decide o comprimento da lista pelo parâmetro de tamanho **ambiente** do QuickCheck (que cresce até 100 ao longo dos testes), não pelo `n` que você reduz manualmente a cada chamada recursiva. A profundidade fica limitada; a **largura** de cada nível, não — e a árvore cresce exponencialmente. A correção é envolver a chamada a `listOf` com `resize (n \`div\` 2)`, para que a lista em si também encolha com a profundidade:

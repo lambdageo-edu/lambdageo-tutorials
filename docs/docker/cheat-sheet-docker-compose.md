@@ -1,6 +1,6 @@
 # 🐳 DOCKER & DOCKER COMPOSE – CHEAT SHEET
 
-*(Encontro 1 | Imprima ou mantenha aberto na segunda tela)*
+*(Imprima ou mantenha aberto na segunda tela)*
 
 ---
 
@@ -34,7 +34,7 @@
 | `-v nome:/path` | `volumes: ["nome:/path"]` |
 | `--network net` | `networks: ["net"]` |
 | `--name svc` | `services: svc:` |
-| `--depends-on svc` | `depends_on: ["svc"]` |
+| _(sem equivalente: você roda na ordem certa)_ | `depends_on: ["svc"]` |
 
 ⚠️ **REGRAS DE OURO DO COMPOSE**
 
@@ -62,7 +62,7 @@
 |  | `docker compose logs -f [servico]` | Logs em tempo real (filtre por serviço) |
 |  | `docker compose ps / exec / config` | Estado, terminal interativo, valida YAML |
 | **Limpeza** | `docker system df` | Espaço usado por Docker |
-|  | `docker system prune -f` | Remove containers/imagens/networks órfãos (seguro) |
+|  | `docker system prune -f` | Remove containers parados, redes sem uso, imagens "dangling" e cache de build |
 
 ---
 

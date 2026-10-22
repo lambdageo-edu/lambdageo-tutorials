@@ -40,7 +40,7 @@ Para trabalhar com `atom`s, usamos três coisas:
 
 1. **`(atom {...})`**: o **construtor** — cria a caixa com um valor inicial dentro.
 2. **`@`** (lê-se "deref"): o **leitor** — "olha dentro" da caixa e vê o valor atual.
-3. **`(swap! ...)`**: o **escritor** — troca o conteúdo da caixa aplicando uma função ao valor antigo. Ele é "atômico" (daí o nome): mesmo que 1000 requisições tentem criar um todo ao mesmo tempo, nenhuma escrita é perdida.
+3. **`(swap! ...)`**: o **escritor** — troca o conteúdo da caixa aplicando uma função ao valor antigo. Ele é "atômico" (daí o nome): mesmo que 1000 requisições chamem `swap!` ao mesmo tempo, nenhuma atualização é perdida. Atenção: a garantia vale para **cada** `swap!`; ler a caixa com `@` e depois escrever com `swap!` são dois passos separados, e outra requisição pode agir entre eles (veremos isso no `create-todo`).
 
 ### Passo 2.2: O Banco (`db.clj`)
 
@@ -57,7 +57,8 @@ Para trabalhar com `atom`s, usamos três coisas:
 ;; Nosso banco terá a forma: {1 {:id 1, :title "..."}, 2 {:id 2, ...}}
 
 ;; Uma "caixa" separada para o contador de IDs.
-(def next-id (atom 1))
+;; Começa em 0: cada novo todo recebe o valor já incrementado (1, 2, 3...).
+(def next-id (atom 0))
 
 ;; --- Nossas Funções de Acesso ao Banco ---
 
@@ -71,8 +72,9 @@ Para trabalhar com `atom`s, usamos três coisas:
 (defn create-todo
   "Cria um novo 'todo', salva no banco e o retorna."
   [todo-data] ;; ex: {:title "Minha tarefa"}
-  (let [;; 1. Lê o ID atual (ex: 1) usando '@'
-        id @next-id
+  (let [;; 1. Gera o próximo ID: swap! incrementa a caixa e DEVOLVE
+        ;;    o novo valor, tudo em um único passo atômico.
+        id (swap! next-id inc)
 
         ;; 2. Cria um NOVO mapa imutável com os dados completos
         new-todo (assoc todo-data
@@ -84,18 +86,19 @@ Para trabalhar com `atom`s, usamos três coisas:
     ;;    aplicando 'assoc' ao mapa antigo para criar um novo.
     (swap! todos-db assoc id new-todo)
 
-    ;; 4. Incrementa o contador na caixa 'next-id'.
-    (swap! next-id inc)
-
-    ;; 5. Retorna o 'todo' recém-criado.
+    ;; 4. Retorna o 'todo' recém-criado.
     new-todo))
 ```
+
+!!! warning "Por que não `id @next-id` e depois `(swap! next-id inc)`?"
+    Parece equivalente, mas são **dois passos**: ler o valor e, depois, incrementar. Se duas requisições chegarem juntas, as duas podem ler o mesmo `id` antes que qualquer uma incremente — e a segunda sobrescreve o todo da primeira no `todos-db`. Num teste com 2000 criações simultâneas (`future`), essa versão "perdeu" dezenas de todos (entre 37 e 146, em três execuções); com `(swap! next-id inc)`, que lê e incrementa num único passo atômico, os 2000 foram salvos todas as vezes.
+
 
 ### O que fizemos?
 
 - **`todos-db` e `next-id`**: dois `atom`s (caixas) para guardar nosso "banco" e nosso contador de IDs.
 - **`get-all-todos`**: uma função que _lê_ o atom (`@`).
-- **`create-todo`**: uma função que _escreve_ no atom (`swap!`), adicionando um todo e incrementando o ID.
+- **`create-todo`**: uma função que _escreve_ nos atoms (`swap!`): gera o ID e adiciona o todo.
 
 Agora temos a lógica do banco. Mas, como bons engenheiros, não vamos _assumir_ que funciona. Vamos _provar_.
 
@@ -154,9 +157,9 @@ user=> (db/get-all-todos)
 user=> @db/todos-db
 {1 {:title "Testar o REPL", ...}, 2 {:title "Aprender Clojure", ...}}
 
-;; O contador de ID (deve ser 3 agora)
+;; O contador de ID (o último ID usado: 2)
 user=> @db/next-id
-3
+2
 ```
 
 ### O que fizemos?

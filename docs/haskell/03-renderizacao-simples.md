@@ -42,6 +42,12 @@ Por que separar o código de renderização do código que realmente imprime? Is
 
 Essa ideia de separar código puro de código impuro é poderosa e onipresente em Haskell. Várias bibliotecas de compressão existem, e todas têm uma interface simples: uma função que aceita uma string descompactada e retorna uma string compactada. Podemos usar composição de funções para converter dados JSON em string e compactá-los em outra string, adiando qualquer decisão sobre como, efetivamente, mostrar ou transmitir os dados.
 
+!!! warning "Registre o módulo novo no `.cabal`"
+    Como vimos no capítulo anterior, cada arquivo novo em `src/` precisa entrar na lista `exposed-modules:` do `hs2json.cabal`. Sem isso, o `import PutJSON` abaixo falha com `Could not find module 'PutJSON'`:
+    ```cabal
+        exposed-modules:  SimpleJSON, PutJSON
+    ```
+
 Experimentando:
 
 ```
@@ -85,7 +91,7 @@ renderJValue (JNumber num) = double num
 renderJValue (JString str) = string str
 ```
 
-O tipo `Doc` e as funções `text`, `double` e `string` serão fornecidos pelo nosso módulo `Prettify`.
+O tipo `Doc` e as funções `text`, `double` e `string` serão fornecidos pelo nosso módulo `Prettify`. Como `PrettyJSON` e `Prettify` são dois módulos novos, acrescente **os dois** ao `exposed-modules:` do `.cabal` (`SimpleJSON, PutJSON, Prettify, PrettyJSON`).
 
 !!! warning
     **A linha `import Prelude hiding ((<>))` é obrigatória — e é a maior mudança desde o livro original.** Quando _Real World Haskell_ foi escrito, o operador `<>` era um nome livre. Desde o **GHC 8.4** (2018), porém, o Prelude exporta `<>` (o operador da classe `Semigroup`). Como nossa biblioteca define o **seu próprio** `<>` para concatenar documentos, precisamos esconder o do Prelude em **todos os módulos que definem ou usam o nosso** — ou seja, tanto em `Prettify.hs` quanto em `PrettyJSON.hs`. Se você esquecer essa linha, o GHC reclamará de _"Ambiguous occurrence '<>'"_. Guarde este erro: ele é um clássico ao seguir material antigo de Haskell.
@@ -120,6 +126,7 @@ double num = undefined
 O valor especial `undefined` tem o tipo `a`, então ele passa pela verificação de tipos não importa onde o usemos. Se tentarmos **avaliá-lo**, ele causará um erro no programa:
 
 ```
+ghci> import Prettify
 ghci> :type undefined
 undefined :: HasCallStack => a
 ghci> undefined
@@ -133,4 +140,6 @@ ghci> double 3.14
 _(No GHC moderno, o tipo aparece como `HasCallStack => a` — o `HasCallStack` é só o mecanismo que permite ao erro apontar a linha exata onde o `undefined` explodiu. Para nossos propósitos, leia como o `a` do livro original.)_
 
 Embora não possamos **executar** os esboços, o verificador de tipos garante que o programa está sensatamente tipado.
+
+_(O `cabal build` agora compila, mas com alguns avisos: `Defined but not used` nos parâmetros dos esboços e `Pattern match(es) are non-exhaustive` no `renderJValue`, que ainda não trata arrays e objetos. Eles somem à medida que o código fica completo.)_
 

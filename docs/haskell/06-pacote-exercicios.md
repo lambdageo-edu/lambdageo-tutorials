@@ -50,19 +50,23 @@ category:        Text
 
 A maioria dos pacotes Haskell usa a licença BSD de 3 cláusulas, que o Cabal chama de `BSD-3-Clause` (você é livre para escolher a que achar apropriada; o campo `license-file` aponta para o arquivo com o texto exato).
 
-Em seguida vêm as seções `library` e `executable`, cada uma com seus próprios `build-depends` e `exposed-modules`:
+Em seguida vêm as seções `library` e `executable`, cada uma com seus próprios `build-depends` (e a `library`, com os `exposed-modules`). Ao fim da Parte 1, as duas devem estar assim (a faixa de versão do `base` é a que o seu `cabal init` gerou):
 
 ```cabal
 library
-    exposed-modules: SimpleJSON, PutJSON, Prettify, PrettyJSON, QuickTestes
-    hs-source-dirs:  src
-    build-depends:   base >= 4.7 && < 5
+    import:           warnings
+    exposed-modules:  SimpleJSON, PutJSON, Prettify, PrettyJSON
+    build-depends:    base ^>=4.17.2.0
+    hs-source-dirs:   src
     default-language: Haskell2010
 
-executable hs2json-exe
-    main-is:         Main.hs
-    hs-source-dirs:  app
-    build-depends:   base >= 4.7 && < 5, hs2json
+executable hs2json
+    import:           warnings
+    main-is:          Main.hs
+    build-depends:
+        base ^>=4.17.2.0,
+        hs2json
+    hs-source-dirs:   app
     default-language: Haskell2010
 ```
 
@@ -73,11 +77,11 @@ Traduzindo:
 - **`executable`** descreve o binário. Note que ele **depende da própria biblioteca** (`hs2json`) — é assim que o `Main.hs` enxerga o `SimpleJSON`.
 
 !!! note
-    **Entendendo as dependências:** não precisamos adivinhar quais pacotes declarar. Experimente remover a linha `base >= 4.7 && < 5` e rodar `cabal build`: a compilação falha imediatamente, com o GHC dizendo que não encontra nem o Prelude. A mensagem de erro nos diz o que falta — recoloque a linha e tudo volta. Explicitar as dependências tem um benefício prático enorme: é o que permite ao cabal-install baixar, compilar e instalar automaticamente **tudo** de que um pacote precisa, recursivamente.
+    **Entendendo as dependências:** não precisamos adivinhar quais pacotes declarar. Experimente remover o `base` do `build-depends` da biblioteca e rodar `cabal build`: a compilação falha imediatamente, com o GHC dizendo que não encontra nem o Prelude. A mensagem de erro nos diz o que falta — recoloque a linha e tudo volta. Explicitar as dependências tem um benefício prático enorme: é o que permite ao cabal-install baixar, compilar e instalar automaticamente **tudo** de que um pacote precisa, recursivamente.
 
 ### Como o Cabal resolve versões
 
-Diferente de ferramentas baseadas em _snapshots_ (um conjunto fixo de versões de pacotes testadas juntas), o cabal-install resolve as versões das dependências contra o **índice completo do Hackage**, respeitando as faixas de versão (`>= 4.7 && < 5`) que você declarou em cada `build-depends`. Isso te dá acesso imediato a qualquer versão publicada de qualquer pacote, ao custo de builds um pouco menos reprodutíveis entre máquinas diferentes por padrão — se isso for uma preocupação (por exemplo, numa disciplina, para garantir que o projeto de todo mundo compile igual), o comando `cabal freeze` grava um arquivo `cabal.project.freeze` fixando a versão exata resolvida de cada dependência, para todo mundo usar a mesma.
+Diferente de ferramentas baseadas em _snapshots_ (um conjunto fixo de versões de pacotes testadas juntas), o cabal-install resolve as versões das dependências contra o **índice completo do Hackage**, respeitando as faixas de versão (como `^>=4.17.2.0`, que significa "4.17.2.0 ou mais nova, mas menor que 4.18") que você declarou em cada `build-depends`. Isso te dá acesso imediato a qualquer versão publicada de qualquer pacote, ao custo de builds um pouco menos reprodutíveis entre máquinas diferentes por padrão — se isso for uma preocupação (por exemplo, numa disciplina, para garantir que o projeto de todo mundo compile igual), o comando `cabal freeze` grava um arquivo `cabal.project.freeze` fixando a versão exata resolvida de cada dependência, para todo mundo usar a mesma.
 
 ### Compilando, testando e instalando
 
@@ -85,8 +89,8 @@ Com a descrição pronta, o ciclo completo é:
 
 ```
 $ cabal build            # compila biblioteca e executáveis
-$ cabal run hs2json-exe  # executa o executável
-$ cabal test             # roda a suíte de testes (test/Spec.hs)
+$ cabal run hs2json      # executa o executável
+$ cabal test             # roda a suíte de testes (test/Main.hs)
 $ cabal install           # copia o executável para ~/.local/bin (ou ~/.cabal/bin)
 ```
 

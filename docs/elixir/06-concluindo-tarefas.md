@@ -29,7 +29,7 @@ Abra `lib/elixir_todo_list_web/live/todo_live.ex`, encontre o loop `<li :for={ta
               id={"task-#{task.id}"}
               class="flex justify-between items-center p-3 border-b"
             >
-              <% task_form = Task.changeset(task, %{}) |> to_form() %>
+              <% task_form = Task.changeset(task, %{}) |> to_form(id: "task-#{task.id}") %>
 
               <.form
                 for={task_form}
@@ -68,7 +68,7 @@ Abra `lib/elixir_todo_list_web/live/todo_live.ex`, encontre o loop `<li :for={ta
 
 | Elemento                                                 | Função                                                                                                                                              |
 | -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `<% task_form = ... %>`                                  | Cria uma variável temporária: o formulário individual **daquela** tarefa (um changeset "vazio" sobre a tarefa existente, convertido com `to_form`). |
+| `<% task_form = ... %>`                                  | Cria uma variável temporária: o formulário individual **daquela** tarefa (um changeset "vazio" sobre a tarefa existente, convertido com `to_form`). O `id: "task-#{task.id}"` dá a cada formulário um prefixo próprio; sem ele, todos os checkboxes teriam o mesmo `id` HTML (`task_completed`), e o LiveView reclamaria de IDs duplicados no console do navegador. |
 | `id={"task-#{task.id}"}`                                 | Um `id` único por `<li>` — ajuda o LiveView a rastrear cada item.                                                                                   |
 | `phx-change="toggle_complete"`                           | Evento disparado automaticamente ao marcar/desmarcar o checkbox.                                                                                    |
 | `phx-value-id={task.id}`                                 | Envia o **ID da tarefa** junto ao evento.                                                                                                           |
@@ -258,7 +258,7 @@ defmodule ElixirTodoListWeb.TodoLive do
               id={"task-#{task.id}"}
               class="flex justify-between items-center p-3 border-b"
             >
-              <% task_form = Task.changeset(task, %{}) |> to_form() %>
+              <% task_form = Task.changeset(task, %{}) |> to_form(id: "task-#{task.id}") %>
 
               <.form
                 for={task_form}

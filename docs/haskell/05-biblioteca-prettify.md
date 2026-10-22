@@ -81,6 +81,13 @@ x <> y = x `Concat` y
 
 Casamos o padrão `Empty` de forma que concatenar um `Doc` com `Empty` à esquerda ou à direita não tenha efeito. Isso evita acrescentar valores inúteis à árvore:
 
+!!! warning "O `<>` no GHCi"
+    Se você abrir o `cabal repl` e simplesmente digitar `import Prettify`, a expressão abaixo dá `Ambiguous occurrence '<>'`: o prompt do GHCi enxerga ao mesmo tempo o `<>` do Prelude e o nosso. A solução é entrar no **interior** dos módulos com `:module *`, onde vale o `import Prelude hiding ((<>))` que escrevemos nos arquivos:
+    ```
+    ghci> :module *Prettify *PrettyJSON
+    ```
+    O `*` dá acesso a **tudo** que está definido nos módulos, inclusive o que não é exportado (os construtores do `Doc` e a função `fits`, que usaremos adiante). Todas as sessões de GHCi deste capítulo partem desse comando.
+
 ```
 ghci> text "foo" <> text "bar"
 Concat (Text "foo") (Text "bar")
@@ -91,7 +98,7 @@ Text "bar"
 ```
 
 !!! note
-    **Um momento matemático:** se colocarmos brevemente nossos chapéus de matemáticos, podemos dizer que `Empty` é a **identidade** da concatenação, pois nada acontece ao concatenar um `Doc` com `Empty` — assim como `0` é a identidade da adição e `1` a da multiplicação. Essa perspectiva tem consequências muito úteis. Aliás, aqui está a piada interna do Haskell moderno: um tipo com uma operação associativa como `<>` é um **`Semigroup`**, e com um elemento identidade como `empty` é um **`Monoid`** — exatamente as classes que hoje vivem no Prelude e que nos obrigaram ao `hiding ((<>))`. Nosso `Doc` poderia declarar instâncias delas; fica como exploração para depois das classes de tipos (Capítulo 6).
+    **Um momento matemático:** se colocarmos brevemente nossos chapéus de matemáticos, podemos dizer que `Empty` é a **identidade** da concatenação, pois nada acontece ao concatenar um `Doc` com `Empty` — assim como `0` é a identidade da adição e `1` a da multiplicação. Essa perspectiva tem consequências muito úteis. Aliás, aqui está a piada interna do Haskell moderno: um tipo com uma operação associativa como `<>` é um **`Semigroup`**, e com um elemento identidade como `empty` é um **`Monoid`** — exatamente as classes que hoje vivem no Prelude e que nos obrigaram ao `hiding ((<>))`. Nosso `Doc` poderia declarar instâncias delas; fica como exploração para depois de estudar classes de tipos (o Capítulo 6 do _Real World Haskell_).
 
 Nossas funções `hcat` e `fsep` concatenam uma lista de `Doc` em um só. Lembre-se de que podemos definir a concatenação de listas usando `foldr`:
 
@@ -175,8 +182,7 @@ Agora já preenchemos definições suficientes para experimentar a `compact` no 
 
 ```
 $ cabal repl
-ghci> import Prettify
-ghci> import PrettyJSON
+ghci> :module *Prettify *PrettyJSON
 ghci> let value = renderJValue (JObject [("f", JNumber 1), ("q", JBool True)])
 ghci> :type value
 value :: Doc
@@ -255,7 +261,7 @@ w `fits` (c:cs)    = (w - 1) `fits` cs
 ```
 
 !!! tip
-    **Sobre os avisos do compilador:** se você ativar `-Wall` no `.cabal` do projeto (recomendado — veremos isso no Capítulo 6), e o GHC emitirá alguns _warnings_ neste código — por exemplo, `Defined but not used: 'p'` na primeira equação de `punctuate` e avisos similares em `fits`. **Warnings não são erros**: o programa compila e funciona. Eles apontam variáveis nomeadas que não usamos; a convenção idiomática é prefixá-las com sublinhado (`_p`, `_w`) para dizer ao compilador "eu sei, é de propósito". Mantivemos o código como no livro original; silenciar os avisos fica como micro-exercício.
+    **Sobre os avisos do compilador:** como o `-Wall` já está ativo no `.cabal` desde o Capítulo 1, o GHC emite alguns _warnings_ neste código — por exemplo, `Defined but not used: 'p'` na primeira equação de `punctuate` e avisos similares em `fits`. **Warnings não são erros**: o programa compila e funciona. Eles apontam variáveis nomeadas que não usamos; a convenção idiomática é prefixá-las com sublinhado (`_p`, `_w`) para dizer ao compilador "eu sei, é de propósito". Mantivemos o código como no livro original; silenciar os avisos fica como micro-exercício.
 
 ### Seguindo o fluxo de execução
 

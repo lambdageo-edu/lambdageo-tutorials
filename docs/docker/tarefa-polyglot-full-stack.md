@@ -150,7 +150,25 @@ app.post('/todos', async (req, res) => {
 });
 
 pool.query(`CREATE TABLE IF NOT EXISTS todos (id SERIAL PRIMARY KEY, title TEXT, created_at TIMESTAMP DEFAULT NOW())`)
-  .then(() => app.listen(3000, () => console.log('✅ Node API rodando na porta 3000')));
+  .then(() => app.listen(3000, () => console.log('✅ Node API rodando na porta 3000')))
+  .catch(err => {
+    // Sem este catch, a falha vira uma "unhandled rejection" e o Node encerra
+    // o processo sem explicar o motivo.
+    console.error('❌ Não consegui preparar o banco:', err.message);
+    process.exit(1);
+  });
+```
+
+### 🟢 `node-api/Dockerfile`
+
+```docker
+FROM node:20-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+EXPOSE 3000
+CMD ["node", "index.js"]
 ```
 
 ### 🐍 `python-svc/main.py` *(adicionado CORS)*
@@ -184,6 +202,7 @@ def stats():
     cur = conn.cursor()
     cur.execute("SELECT COUNT(*), AVG(LENGTH(title)) FROM todos")
     row = cur.fetchone()
+    conn.close()  # uma conexão por requisição: feche ao terminar
     return {"total_todos": row[0], "avg_title_length": float(row[1]) if row[1] else 0}
 
 if __name__ == "__main__":
@@ -226,7 +245,7 @@ CMD ["nginx", "-g", "daemon off;"]
 
 ## 🛠️ `docker-compose.yml` (Esqueleto para completar)
 
-> ⚠️ **Desafio:** Preencha os `_________` usando os conceitos do Encontro 1.
+> ⚠️ **Desafio:** Preencha os `_________` usando os conceitos dos capítulos anteriores.
 > 
 
 ```yaml
@@ -238,6 +257,11 @@ services:
       POSTGRES_PASSWORD: secret
     volumes:
       - _________:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 15
 
   node-api:
     build: ./node-api
@@ -248,7 +272,8 @@ services:
       DB_PASSWORD: secret
       DB_NAME: polyglot
     depends_on:
-      - db
+      db:
+        condition: service_healthy  # espera o Postgres aceitar conexões
 
   python-svc:
     build: ./python-svc
@@ -259,7 +284,8 @@ services:
       DB_PASSWORD: secret
       DB_NAME: polyglot
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   frontend:
     build: ./frontend
@@ -303,7 +329,7 @@ volumes:
 | `Blocked by CORS policy` | Backend sem CORS ou frontend usando IP errado | `docker compose logs node-api` → adicione `app.use(cors())` |
 | `fetch failed` ou `Network Error` | Frontend tentando `http://localhost` dentro do container Nginx | Nginx roda no container, mas o JS roda no **navegador**. `localhost` aponta para a máquina host. ✅ Correto! |
 | Python `ModuleNotFoundError` | `requirements.txt` não copiado ou `pip install` falhou | `docker compose build python-svc` → veja output do build |
-| DB `connection refused` | `DB_HOST` errado ou Postgres ainda iniciando | `docker compose logs db \| grep "ready"` |
+| DB `connection refused` | `DB_HOST` errado ou Postgres ainda iniciando | `docker compose logs db \| grep "ready"`. É por isso que o esqueleto usa `healthcheck` + `condition: service_healthy`: um `depends_on` simples só espera o container **iniciar**, e o Postgres leva alguns segundos para aceitar conexões. |
 | Frontend 404 | `COPY` no Dockerfile apontando para arquivo errado | `docker compose exec frontend ls /usr/share/nginx/html` |
 
 ---

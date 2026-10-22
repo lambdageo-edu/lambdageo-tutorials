@@ -98,13 +98,13 @@ docker exec tmp cat //data/log.txt
     - Desativar a conversão de path no comando:
 
     ```
-    MSYS_NO_PATHCONV=1 docker exec <container>cat /data/log.txt
+    MSYS_NO_PATHCONV=1 docker exec <container> cat /data/log.txt
     ```
 
     - Ou usar caminho com escape:
 
     ```
-    docker exec <container>cat //data/log.txt
+    docker exec <container> cat //data/log.txt
     ```
 
     ### 📌 Observação
@@ -174,7 +174,7 @@ docker exec bind-test cat /dados/arquivo.txt
 # → persiste no host ✅
 ```
 
-⚠️ **Cuidado:** Bind mounts herdam permissões do host. No Linux, se o container roda como `root` e você como `user 1000`, pode dar `Permission denied`. Use `:z`/`:Z` ou ajuste `uid/gid` em produção.
+⚠️ **Cuidado:** Bind mounts herdam permissões do host. No Linux, se o container roda como `root` e você como `user 1000`, os arquivos criados pelo container ficam com dono `root` no seu disco (e você pode levar `Permission denied` ao editá-los). Ajuste o usuário do container (`--user $(id -u):$(id -g)`). Em sistemas com SELinux (Fedora, RHEL), use também os sufixos `:z`/`:Z`, que reetiquetam a pasta para o container poder acessá-la.
 
 ### 🔹 B. Named Volume (Gerenciado pelo Docker)
 
@@ -232,17 +232,19 @@ docker volume rm pg_data  # ⚠️ Apaga os dados permanentemente
     
     ```bash
     docker exec tmp ls /
-    docker exec tmp mkdir -p /app && echo "oi" > /app/test.txt
-    docker exec tmp ls /app
+    docker exec tmp sh -c 'mkdir -p /app && echo "oi" > /app/test.txt'
+    docker exec tmp ls /app  # → test.txt
     docker rm -f tmp
     docker run -d --name tmp alpine sleep 300
-    docker exec tmp ls /app  # → (vazio, filesystem resetado)
+    docker exec tmp ls /app  # → ls: /app: No such file or directory (filesystem resetado)
     ```
+
+    _(O `sh -c '...'` é necessário: sem ele, o `>` seria interpretado pelo **seu** terminal, que tentaria criar `/app/test.txt` no host.)_
     
 3. **Compare permissões:**
     
     ```bash
-    ls -la ~/docker-demo/vol-host/
+    ls -la docker-demo/vol-host/
     docker exec bind-test ls -la /dados/
     # → Note como uid/gid podem divergir entre host e container
     ```
@@ -266,6 +268,6 @@ docker volume create/ls/rm # Gerencia volumes nomeados
 ### 🧹 Limpeza Antes de Continuar
 
 ```bash
-docker rm -f $(docker ps -aq)
+docker rm -f tmp bind-test db-test 2>/dev/null
 docker volume rm pg_data 2>/dev/null || true
 ```
