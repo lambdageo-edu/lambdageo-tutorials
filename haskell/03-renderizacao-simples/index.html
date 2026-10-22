@@ -1683,11 +1683,17 @@
 <p>Imprimir um valor JSON agora é fácil.</p>
 <p>Por que separar o código de renderização do código que realmente imprime? Isso nos dá flexibilidade. Por exemplo: se quiséssemos compactar os dados antes de imprimi-los, e o código de renderização estivesse misturado com o de impressão, adaptar o código seria muito mais difícil.</p>
 <p>Essa ideia de separar código puro de código impuro é poderosa e onipresente em Haskell. Várias bibliotecas de compressão existem, e todas têm uma interface simples: uma função que aceita uma string descompactada e retorna uma string compactada. Podemos usar composição de funções para converter dados JSON em string e compactá-los em outra string, adiando qualquer decisão sobre como, efetivamente, mostrar ou transmitir os dados.</p>
+<div class="admonition warning">
+<p class="admonition-title">Registre o módulo novo no <code>.cabal</code></p>
+<p>Como vimos no capítulo anterior, cada arquivo novo em <code>src/</code> precisa entrar na lista <code>exposed-modules:</code> do <code>hs2json.cabal</code>. Sem isso, o <code>import PutJSON</code> abaixo falha com <code>Could not find module 'PutJSON'</code>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>    exposed-modules:  SimpleJSON, PutJSON
+</code></pre></div></p>
+</div>
 <p>Experimentando:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>$ cabal repl
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>ghci&gt; import PutJSON
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>ghci&gt; putJValue (JObject [("nome", JString "Sergio"), ("idade", JNumber 38)])
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>{"nome": "Sergio", "idade": 38.0}
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>$ cabal repl
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>ghci&gt; import PutJSON
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>ghci&gt; putJValue (JObject [("nome", JString "Sergio"), ("idade", JNumber 38)])
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>{"nome": "Sergio", "idade": 38.0}
 </code></pre></div>
 <h2 id="uma-visao-mais-geral-de-renderizacao">Uma visão mais geral de renderização<a class="headerlink" href="#uma-visao-mais-geral-de-renderizacao" title="Permanent link">&para;</a></h2>
 <p>Nosso código de renderização JSON está adaptado às necessidades dos nossos tipos de dados e às convenções de formatação do JSON. A saída que ele produz pode não ser amigável aos olhos humanos. Agora olharemos a renderização como uma tarefa mais genérica: como construir uma biblioteca útil para renderizar dados em uma variedade de situações?</p>
@@ -1700,22 +1706,22 @@
 <p>Para termos certeza de que <code>Prettify</code> atende a necessidades práticas, escreveremos um novo renderizador de JSON que usa a API do <code>Prettify</code>. Depois que estiver pronto, voltaremos e preencheremos os detalhes do módulo <code>Prettify</code>.</p>
 <p>Em vez de renderizar direto para string, nosso <code>Prettify</code> usará um tipo <strong>abstrato</strong>, que chamaremos de <code>Doc</code>. Baseando nossa biblioteca em um tipo abstrato, podemos trocar a implementação por uma mais flexível ou mais eficiente sem que os usuários da biblioteca percebam.</p>
 <p>Chamaremos nosso novo renderizador JSON de <code>PrettyJSON.hs</code>, mantendo o nome <code>renderJValue</code> para a função de renderização. Renderizar um dos valores básicos do JSON é simples:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">-- src/PrettyJSON.hs</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kr">module</span><span class="w"> </span><span class="nn">PrettyJSON</span><span class="w"> </span><span class="kr">where</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="kr">import</span><span class="w"> </span><span class="nn">Prelude</span><span class="w"> </span><span class="k">hiding</span><span class="w"> </span><span class="p">((</span><span class="o">&lt;&gt;</span><span class="p">))</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="kr">import</span><span class="w"> </span><span class="nn">SimpleJSON</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="kr">import</span><span class="w"> </span><span class="nn">Prettify</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="nf">renderJValue</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">JValue</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">Doc</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="nf">renderJValue</span><span class="w"> </span><span class="p">(</span><span class="kt">JBool</span><span class="w"> </span><span class="kt">True</span><span class="p">)</span><span class="w">  </span><span class="ow">=</span><span class="w"> </span><span class="n">text</span><span class="w"> </span><span class="s">"true"</span>
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="nf">renderJValue</span><span class="w"> </span><span class="p">(</span><span class="kt">JBool</span><span class="w"> </span><span class="kt">False</span><span class="p">)</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="n">text</span><span class="w"> </span><span class="s">"false"</span>
-<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="nf">renderJValue</span><span class="w"> </span><span class="kt">JNull</span><span class="w">         </span><span class="ow">=</span><span class="w"> </span><span class="n">text</span><span class="w"> </span><span class="s">"null"</span>
-<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="nf">renderJValue</span><span class="w"> </span><span class="p">(</span><span class="kt">JNumber</span><span class="w"> </span><span class="n">num</span><span class="p">)</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="n">double</span><span class="w"> </span><span class="n">num</span>
-<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="nf">renderJValue</span><span class="w"> </span><span class="p">(</span><span class="kt">JString</span><span class="w"> </span><span class="n">str</span><span class="p">)</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="n">string</span><span class="w"> </span><span class="n">str</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1">-- src/PrettyJSON.hs</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kr">module</span><span class="w"> </span><span class="nn">PrettyJSON</span><span class="w"> </span><span class="kr">where</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="kr">import</span><span class="w"> </span><span class="nn">Prelude</span><span class="w"> </span><span class="k">hiding</span><span class="w"> </span><span class="p">((</span><span class="o">&lt;&gt;</span><span class="p">))</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="kr">import</span><span class="w"> </span><span class="nn">SimpleJSON</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="kr">import</span><span class="w"> </span><span class="nn">Prettify</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="nf">renderJValue</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">JValue</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">Doc</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="nf">renderJValue</span><span class="w"> </span><span class="p">(</span><span class="kt">JBool</span><span class="w"> </span><span class="kt">True</span><span class="p">)</span><span class="w">  </span><span class="ow">=</span><span class="w"> </span><span class="n">text</span><span class="w"> </span><span class="s">"true"</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="nf">renderJValue</span><span class="w"> </span><span class="p">(</span><span class="kt">JBool</span><span class="w"> </span><span class="kt">False</span><span class="p">)</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="n">text</span><span class="w"> </span><span class="s">"false"</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="nf">renderJValue</span><span class="w"> </span><span class="kt">JNull</span><span class="w">         </span><span class="ow">=</span><span class="w"> </span><span class="n">text</span><span class="w"> </span><span class="s">"null"</span>
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="nf">renderJValue</span><span class="w"> </span><span class="p">(</span><span class="kt">JNumber</span><span class="w"> </span><span class="n">num</span><span class="p">)</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="n">double</span><span class="w"> </span><span class="n">num</span>
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="nf">renderJValue</span><span class="w"> </span><span class="p">(</span><span class="kt">JString</span><span class="w"> </span><span class="n">str</span><span class="p">)</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="n">string</span><span class="w"> </span><span class="n">str</span>
 </code></pre></div>
-<p>O tipo <code>Doc</code> e as funções <code>text</code>, <code>double</code> e <code>string</code> serão fornecidos pelo nosso módulo <code>Prettify</code>.</p>
+<p>O tipo <code>Doc</code> e as funções <code>text</code>, <code>double</code> e <code>string</code> serão fornecidos pelo nosso módulo <code>Prettify</code>. Como <code>PrettyJSON</code> e <code>Prettify</code> são dois módulos novos, acrescente <strong>os dois</strong> ao <code>exposed-modules:</code> do <code>.cabal</code> (<code>SimpleJSON, PutJSON, Prettify, PrettyJSON</code>).</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p><strong>A linha <code>import Prelude hiding ((&lt;&gt;))</code> é obrigatória — e é a maior mudança desde o livro original.</strong> Quando <em>Real World Haskell</em> foi escrito, o operador <code>&lt;&gt;</code> era um nome livre. Desde o <strong>GHC 8.4</strong> (2018), porém, o Prelude exporta <code>&lt;&gt;</code> (o operador da classe <code>Semigroup</code>). Como nossa biblioteca define o <strong>seu próprio</strong> <code>&lt;&gt;</code> para concatenar documentos, precisamos esconder o do Prelude em <strong>todos os módulos que definem ou usam o nosso</strong> — ou seja, tanto em <code>Prettify.hs</code> quanto em <code>PrettyJSON.hs</code>. Se você esquecer essa linha, o GHC reclamará de <em>"Ambiguous occurrence '&lt;&gt;'"</em>. Guarde este erro: ele é um clássico ao seguir material antigo de Haskell.</p>
@@ -1724,35 +1730,37 @@
 <p>No início, quando estamos nos familiarizando com o desenvolvimento em Haskell, temos tantos conceitos novos para entender de uma vez que escrever código que compile sem erros pode ser um desafio.</p>
 <p>Enquanto escrevemos o corpo inicial do código, ajuda muito parar a cada poucos minutos e tentar compilar o que produzimos até o momento. Como Haskell é fortemente tipado, se o código compila, estamos longe de muitas armadilhas da programação.</p>
 <p>Uma técnica útil para desenvolver o esqueleto de um programa é escrever versões <em>de esboço</em> (placeholders) dos nossos tipos e funções. Por exemplo: dissemos acima que as funções <code>string</code>, <code>text</code> e <code>double</code> serão fornecidas pelo módulo <code>Prettify</code>. Se não fornecermos definições para essas funções nem para o tipo <code>Doc</code>, nosso lema "compile cedo, compile frequentemente" falha logo no renderizador, pois o compilador não conhece nada sobre elas. Para evitar o problema, escrevemos esboços que não fazem nada:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1">-- src/Prettify.hs</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kr">module</span><span class="w"> </span><span class="nn">Prettify</span><span class="w"> </span><span class="kr">where</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="kr">import</span><span class="w"> </span><span class="nn">Prelude</span><span class="w"> </span><span class="k">hiding</span><span class="w"> </span><span class="p">((</span><span class="o">&lt;&gt;</span><span class="p">))</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="kr">data</span><span class="w"> </span><span class="kt">Doc</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kt">ToBeDefined</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">         </span><span class="kr">deriving</span><span class="w"> </span><span class="p">(</span><span class="kt">Show</span><span class="p">)</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="nf">string</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">Doc</span>
-<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="nf">string</span><span class="w"> </span><span class="n">str</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="n">undefined</span>
-<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>
-<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="nf">text</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">Doc</span>
-<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="nf">text</span><span class="w"> </span><span class="n">str</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="n">undefined</span>
-<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>
-<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="nf">double</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">Double</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">Doc</span>
-<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="nf">double</span><span class="w"> </span><span class="n">num</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="n">undefined</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1">-- src/Prettify.hs</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kr">module</span><span class="w"> </span><span class="nn">Prettify</span><span class="w"> </span><span class="kr">where</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="kr">import</span><span class="w"> </span><span class="nn">Prelude</span><span class="w"> </span><span class="k">hiding</span><span class="w"> </span><span class="p">((</span><span class="o">&lt;&gt;</span><span class="p">))</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="kr">data</span><span class="w"> </span><span class="kt">Doc</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kt">ToBeDefined</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">         </span><span class="kr">deriving</span><span class="w"> </span><span class="p">(</span><span class="kt">Show</span><span class="p">)</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="nf">string</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">Doc</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="nf">string</span><span class="w"> </span><span class="n">str</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="n">undefined</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="nf">text</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">Doc</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="nf">text</span><span class="w"> </span><span class="n">str</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="n">undefined</span>
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>
+<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="nf">double</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">Double</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">Doc</span>
+<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="nf">double</span><span class="w"> </span><span class="n">num</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="n">undefined</span>
 </code></pre></div>
 <p>O valor especial <code>undefined</code> tem o tipo <code>a</code>, então ele passa pela verificação de tipos não importa onde o usemos. Se tentarmos <strong>avaliá-lo</strong>, ele causará um erro no programa:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>ghci&gt; :type undefined
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>undefined :: HasCallStack =&gt; a
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>ghci&gt; undefined
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>*** Exception: Prelude.undefined
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>ghci&gt; :type double
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>double :: Double -&gt; Doc
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>ghci&gt; double 3.14
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>*** Exception: Prelude.undefined
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>ghci&gt; import Prettify
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>ghci&gt; :type undefined
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>undefined :: HasCallStack =&gt; a
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>ghci&gt; undefined
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>*** Exception: Prelude.undefined
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>ghci&gt; :type double
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>double :: Double -&gt; Doc
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>ghci&gt; double 3.14
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>*** Exception: Prelude.undefined
 </code></pre></div>
 <p><em>(No GHC moderno, o tipo aparece como <code>HasCallStack =&gt; a</code> — o <code>HasCallStack</code> é só o mecanismo que permite ao erro apontar a linha exata onde o <code>undefined</code> explodiu. Para nossos propósitos, leia como o <code>a</code> do livro original.)</em></p>
 <p>Embora não possamos <strong>executar</strong> os esboços, o verificador de tipos garante que o programa está sensatamente tipado.</p>
+<p><em>(O <code>cabal build</code> agora compila, mas com alguns avisos: <code>Defined but not used</code> nos parâmetros dos esboços e <code>Pattern match(es) are non-exhaustive</code> no <code>renderJValue</code>, que ainda não trata arrays e objetos. Eles somem à medida que o código fica completo.)</em></p>
 
 
 

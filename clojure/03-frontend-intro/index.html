@@ -2013,9 +2013,13 @@ Nossa aplicação ClojureScript está funcionando.</p>
 <p><strong>Ação 2 (Teste):</strong></p>
 <ol>
 <li>Salve o arquivo. O shadow-cljs (Terminal 2) recompila sozinho.</li>
-<li>Vá ao navegador em <code>http://localhost:8000</code>.</li>
+<li>Vá ao navegador em <code>http://localhost:8000</code> e <strong>recarregue a página (F5)</strong>.</li>
 <li><strong>Teste a mágica:</strong> clique nos botões. O número muda instantaneamente, sem recarregar a página.</li>
 </ol>
+<div class="admonition tip">
+<p class="admonition-title">Por que o F5?</p>
+<p>O shadow-cljs recompila e recarrega o código a cada salvamento, mas a nossa <code>init</code> só roda quando a página carrega — e é ela que monta o componente na tela. Por isso, sempre que <strong>substituirmos o componente principal</strong> (como agora e nos próximos passos), recarregue a página. Há outro motivo: o <code>defonce</code> preserva o valor do <code>app-state</code> entre recompilações. Sem o F5, o próximo passo herdaria o contador (<code>0</code>) como estado, em vez do mapa novo.</p>
+</div>
 <p><strong>A lição:</strong> você acabou de aprender o "coração" do Reagent: <code>(defonce app-state (r/atom ...))</code> (o cérebro), <code>@app-state</code> (leitura) e <code>swap!</code>/<code>reset!</code> (escrita).</p>
 <h3 id="passo-37-a-ui-estatica-do-todo-com-dados-falsos">Passo 3.7: A UI Estática do Todo (com dados falsos)<a class="headerlink" href="#passo-37-a-ui-estatica-do-todo-com-dados-falsos" title="Permanent link">&para;</a></h3>
 <p><strong>Objetivo:</strong> agora que sabemos <em>como</em> o Reagent funciona, vamos construir o <em>visual</em> (estático) do Todo App. Ele não vai funcionar ainda — apenas parecer correto.</p>
@@ -2063,7 +2067,7 @@ Nossa aplicação ClojureScript está funcionando.</p>
 <p class="admonition-title">Tip</p>
 <p><strong>O que é o <code>^{:key ...}</code>?</strong> Quando renderizamos uma lista com <code>for</code>, o React precisa de uma "identidade" para cada item, para saber o que mudou entre uma renderização e outra. O metadado <code>^{:key (:id todo)}</code> fornece essa identidade. Sem ele, o console mostra o aviso <em>"Every element in a seq should have a unique :key"</em>. <strong>Guarde esse detalhe: ele vai reaparecer na Fase 5.</strong></p>
 </div>
-<p><strong>Teste:</strong> salve e veja no navegador. Você deve ver a UI completa, com os dois todos falsos listados. O campo e o botão estão lá, mas clicar não faz nada.</p>
+<p><strong>Teste:</strong> salve e recarregue o navegador (F5). Você deve ver a UI completa, com os dois todos falsos listados. O campo e o botão estão lá, mas clicar não faz nada.</p>
 <h3 id="passo-38-conectando-a-ui-ao-ratom-tornando-interativo">Passo 3.8: Conectando a UI ao <code>r/atom</code> (Tornando Interativo)<a class="headerlink" href="#passo-38-conectando-a-ui-ao-ratom-tornando-interativo" title="Permanent link">&para;</a></h3>
 <p>Agora vamos fazer o formulário funcionar de verdade — mas ainda <strong>100% local</strong>, sem API.</p>
 <p><strong>Ação 1: Adicionar o <code>clojure.string</code></strong></p>
@@ -2166,7 +2170,7 @@ Nossa aplicação ClojureScript está funcionando.</p>
 <h3 id="teste-a-licao">Teste (A "Lição")<a class="headerlink" href="#teste-a-licao" title="Permanent link">&para;</a></h3>
 <ol>
 <li>Salve o <code>core.cljs</code>. O shadow-cljs recompila.</li>
-<li>Vá ao navegador em <code>http://localhost:8000</code>.</li>
+<li>Vá ao navegador em <code>http://localhost:8000</code> e recarregue (F5): o <code>defonce</code> do contador ainda guardava o número <code>0</code>, e o novo <code>app-state</code> precisa começar do zero como um mapa.</li>
 </ol>
 <p><strong>Teste a interatividade:</strong></p>
 <ol>

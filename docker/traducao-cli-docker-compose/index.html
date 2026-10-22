@@ -1909,7 +1909,9 @@
 <p>Mostre na tela:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>--name<span class="w"> </span>web<span class="w"> </span>-p<span class="w"> </span><span class="m">8080</span>:80<span class="w"> </span>-v<span class="w"> </span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/html:/usr/share/nginx/html:ro<span class="w"> </span>nginx:alpine
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>--name<span class="w"> </span>cache<span class="w"> </span>-v<span class="w"> </span>cache_data:/data<span class="w"> </span>redis:alpine
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>--name<span class="w"> </span>app<span class="w"> </span>-p<span class="w"> </span><span class="m">3000</span>:3000<span class="w"> </span>-e<span class="w"> </span><span class="nv">DB_HOST</span><span class="o">=</span>cache<span class="w"> </span>--network<span class="w"> </span>app-net<span class="w"> </span>--depends-on<span class="w"> </span>cache<span class="w"> </span>node:20-alpine
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>--name<span class="w"> </span>app<span class="w"> </span>-p<span class="w"> </span><span class="m">3000</span>:3000<span class="w"> </span>-e<span class="w"> </span><span class="nv">DB_HOST</span><span class="o">=</span>cache<span class="w"> </span>--network<span class="w"> </span>app-net<span class="w"> </span>node:20-alpine
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># ...e esta terceira linha só pode rodar DEPOIS das outras duas:</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="c1"># o `docker run` não tem nenhuma opção para declarar dependências.</span>
 </code></pre></div>
 <p>🗣️ <strong>Pergunte à turma:</strong></p>
 <ul>
@@ -1967,7 +1969,7 @@
 <td>Anexa à rede</td>
 </tr>
 <tr>
-<td><code>--depends-on cache</code></td>
+<td><em>(não existe no CLI: você roda os comandos na ordem certa, à mão)</em></td>
 <td><code>depends_on: [cache]</code></td>
 <td>Ordem de criação</td>
 </tr>
@@ -1975,7 +1977,7 @@
 </table>
 <p>📌 <strong>Regra de Ouro do Compose:</strong></p>
 <ul>
-<li>Não use <code>version: "3.9"</code> (legado desde Compose v2).</li>
+<li>Não use <code>version: "3.9"</code>: o campo é obsoleto, e o Compose v2 o ignora (e avisa).</li>
 <li>O Compose <strong>cria automaticamente</strong> uma rede chamada <code>&lt;projeto&gt;_default</code>. Você só declara <code>networks:</code> se quiser isolamento extra ou nomes customizados.</li>
 <li>Todos os serviços na mesma rede resolvem DNS por <strong>nome do serviço</strong>.</li>
 </ul>
@@ -2037,19 +2039,21 @@
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">web</span><span class="p">:</span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nginx:alpine</span>
 <a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">published</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8080</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ingress</span>
 <a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">        </span><span class="nt">target</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">80</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bind</span>
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">        </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/caminho/absoluto/para/compose-step-by-step/html</span>
-<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">        </span><span class="nt">target</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/usr/share/nginx/html</span>
-<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">        </span><span class="nt">read_only</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">        </span><span class="nt">published</span><span class="p">:</span><span class="w"> </span><span class="s">"8080"</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">        </span><span class="nt">protocol</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tcp</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bind</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">        </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/caminho/absoluto/para/compose-step-by-step/html</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">        </span><span class="nt">target</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/usr/share/nginx/html</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">        </span><span class="nt">read_only</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </code></pre></div>
 <p>🧠 <strong>O que o Compose fez:</strong></p>
 <ul>
 <li>Resolveu <code>./html</code> para o <strong>caminho absoluto</strong> do seu SO.</li>
 <li>Expandiu a sintaxe curta de <code>ports</code> e <code>volumes</code> para a forma longa e explícita.</li>
-<li>Adicionou automaticamente uma rede <code>default</code> (não aparece aqui, mas existe).</li>
+<li>Adicionou automaticamente uma rede <code>default</code> (no fim da saída, em <code>networks:</code>, com o nome <code>compose-step-by-step_default</code>).</li>
 </ul>
 <h3 id="3-levante-e-teste">3️⃣ Levante e teste<a class="headerlink" href="#3-levante-e-teste" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d
@@ -2107,7 +2111,7 @@
 </table>
 <p>📌 <strong>Regra de Ouro do Compose:</strong></p>
 <blockquote>
-<p>Se tem dois-pontos no volume (<code>nome:/path</code>), declare no bloco raiz <code>volumes:</code>. Se não tem (<code>./pasta:/path</code>), é bind mount e não precisa declarar.</p>
+<p>Olhe o que vem <strong>antes</strong> dos dois-pontos. Se é um <strong>nome</strong> (<code>cache_data:/data</code>), é um named volume: declare-o no bloco raiz <code>volumes:</code>. Se é um <strong>caminho</strong> (<code>./html:/path</code>, começando com <code>.</code> ou <code>/</code>), é bind mount e não precisa declarar.</p>
 </blockquote>
 <h3 id="2-valide-a-configuracao_1">2️⃣ Valide a configuração<a class="headerlink" href="#2-valide-a-configuracao_1" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>config
@@ -2122,25 +2126,23 @@
 <a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">        </span><span class="nt">target</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/data</span>
 <a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="nt">volumes</span><span class="p">:</span>
 <a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">  </span><span class="nt">cache_data</span><span class="p">:</span>
-<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tutorialdocker_cache_data</span>
-<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="w">    </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local</span>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">compose-step-by-step_cache_data</span>
 </code></pre></div>
 <p>🧠 <strong>O que o Compose fez:</strong></p>
 <ul>
 <li>Validou que <code>cache_data</code> existe na seção raiz.</li>
 <li>Resolveu o caminho interno para <code>/data</code> (absoluto, como exige o daemon).</li>
-<li>Prefixou o nome com o projeto (<code>tutorialdocker_</code>) para evitar colisão global.</li>
+<li>Prefixou o nome com o projeto (<code>compose-step-by-step_</code>, o nome da pasta) para evitar colisão global.</li>
 </ul>
 <h3 id="3-levante-incrementalmente-e-teste">3️⃣ Levante incrementalmente e teste<a class="headerlink" href="#3-levante-incrementalmente-e-teste" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d
 </code></pre></div>
-<p>📤 <strong>Output esperado:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>[+] Running 3/3
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a> ✔ Network tutorialdocker_default  Created
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a> ✔ Volume  tutorialdocker_cache_data  Created
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a> ✔ Container tutorialdocker-cache-1  Started
+<p>📤 <strong>Output esperado (o formato exato varia com a versão do Compose):</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a> ✔ Volume "compose-step-by-step_cache_data"  Created
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a> ✔ Container compose-step-by-step-web-1      Running
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a> ✔ Container compose-step-by-step-cache-1    Started
 </code></pre></div>
-<p>🔍 <strong>Note:</strong> O Compose <strong>não recriou</strong> o <code>web</code>. Só criou o volume, anexou à rede e subiu o <code>cache</code>.</p>
+<p>🔍 <strong>Note:</strong> O Compose <strong>não recriou</strong> o <code>web</code> (ele aparece como <code>Running</code>), e a rede <code>compose-step-by-step_default</code> já existia desde o Passo 1. Só criou o volume e subiu o <code>cache</code> na mesma rede.</p>
 <p>✅ <strong>Teste rápido:</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>docker<span class="w"> </span>compose<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>cache<span class="w"> </span>redis-cli<span class="w"> </span>ping
 <a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="c1"># → PONG</span>
@@ -2159,7 +2161,7 @@
 <hr />
 <h2 id="passo-3-servico-app-node">🟡 Passo 3: Serviço App (Node)<a class="headerlink" href="#passo-3-servico-app-node" title="Permanent link">&para;</a></h2>
 <h3 id="1-prepare-a-estrutura">1️⃣ Prepare a estrutura<a class="headerlink" href="#1-prepare-a-estrutura" title="Permanent link">&para;</a></h3>
-<p>Na raiz do projeto (<code>tutorialdocker/</code>), crie a pasta:</p>
+<p>Na raiz do projeto (<code>compose-step-by-step/</code>), crie a pasta:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>mkdir<span class="w"> </span>app
 </code></pre></div>
 <p>Agora, <strong>abra o VS Code</strong> e crie os 3 arquivos abaixo dentro da pasta <code>app/</code>.</p>
@@ -2193,10 +2195,8 @@
 <a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'✅ App ouvindo em http://0.0.0.0:3000'</span><span class="p">);</span>
 <a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'🔗 DB_HOST:'</span><span class="p">,</span><span class="w"> </span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">DB_HOST</span><span class="p">);</span>
 <a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a><span class="p">});</span>
-<a id="__codelineno-15-17" name="__codelineno-15-17" href="#__codelineno-15-17"></a>
-<a id="__codelineno-15-18" name="__codelineno-15-18" href="#__codelineno-15-18"></a><span class="c1">// Mantém o processo vivo para o container não parar</span>
-<a id="__codelineno-15-19" name="__codelineno-15-19" href="#__codelineno-15-19"></a><span class="nx">setInterval</span><span class="p">(()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{},</span><span class="w"> </span><span class="mf">1000</span><span class="p">);</span>
 </code></pre></div>
+<p><em>(Não é preciso nenhum truque para "manter o processo vivo": enquanto o servidor estiver escutando a porta, o Node não termina.)</em></p>
 <p>🔍 <strong>Por que <code>'0.0.0.0'</code>?</strong>Se o Node ouvir apenas <code>127.0.0.1</code> (padrão de alguns frameworks), a requisição fica presa na interface de <em>loopback</em> interna do container. <code>0.0.0.0</code> instrui o processo a escutar em <strong>todas as interfaces de rede</strong>, permitindo que o Docker Engine redirecione a porta do host.</p>
 <p>📦 <strong>Nota:</strong> Este código usa apenas o módulo nativo <code>http</code>. Não precisa instalar <code>express</code>. O <code>package.json</code> anterior já funciona perfeitamente.</p>
 <hr />
@@ -2214,7 +2214,7 @@
 </code></pre></div>
 <p>🔍 <strong>O que faz:</strong></p>
 <ul>
-<li><code>FROM node:20-alpine</code>: Imagem leve (~50MB).</li>
+<li><code>FROM node:20-alpine</code>: Imagem leve (~45 MB para baixar, bem menor que a <code>node:20</code> completa, que passa de 1 GB descompactada).</li>
 <li><code>COPY package*.json ./</code> + <code>RUN npm install</code>: Aproveita cache do Docker. Só reinstala se <code>package.json</code> mudar.</li>
 <li><code>CMD ["npm", "start"]</code>: Processo principal (<code>PID 1</code>) que mantém o container vivo.</li>
 </ul>
@@ -2277,14 +2277,12 @@
 <a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="c1"># 2. Suba tudo (o Compose vai fazer build do app automaticamente)</span>
 <a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>--build
 </code></pre></div>
-<p>📤 <strong>Output esperado:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>[+] Running 4/4
-<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a> ✔ Network tutorialdocker_default        Created
-<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a> ✔ Volume  tutorialdocker_cache_data     Created
-<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a> ✔ Container tutorialdocker-cache-1      Started
-<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a> ✔ Container tutorialdocker-app-1        Started
-<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a> ✔ Container tutorialdocker-web-1        Started
+<p>📤 <strong>Output esperado (trecho):</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a> ✔ Container compose-step-by-step-cache-1  Running
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a> ✔ Container compose-step-by-step-web-1    Running
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a> ✔ Container compose-step-by-step-app-1    Started
 </code></pre></div>
+<p><em>(Antes disso, o Compose mostra o build da imagem do <code>app</code>. Rede e volume já existiam.)</em></p>
 <h3 id="4-teste-dns-interno-logs">✅ 4. Teste DNS Interno &amp; Logs<a class="headerlink" href="#4-teste-dns-interno-logs" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="c1"># Veja o que o app imprimiu ao iniciar</span>
 <a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>docker<span class="w"> </span>compose<span class="w"> </span>logs<span class="w"> </span>app

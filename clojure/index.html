@@ -1690,11 +1690,11 @@
 </tr>
 </tbody>
 </table>
-<blockquote>
-<p>[!NOTE]
-Em sistemas operacionais onde a ferramenta <code>rlwrap</code> não estiver instalada, o comando de atalho <code>clj</code> pode falhar com o erro: <code>Please install rlwrap for command editing or use "clojure" instead.</code>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Em sistemas operacionais onde a ferramenta <code>rlwrap</code> não estiver instalada, o comando de atalho <code>clj</code> pode falhar com o erro: <code>Please install rlwrap for command editing or use "clojure" instead.</code>
 Se isso acontecer no seu ambiente, basta substituir todas as chamadas a <code>clj</code> do tutorial pela palavra <code>clojure</code> (ex: use <code>clojure -M:run</code> em vez de <code>clj -M:run</code>, e <code>clojure</code> para abrir o REPL). Ambos executam exatamente a mesma engine Clojure CLI, mas o comando <code>clojure</code> funciona sem depender do editor de linha de comando <code>rlwrap</code>.</p>
-</blockquote>
+</div>
 <hr />
 <h3 id="os-marcos-do-git-seu-historico-final">🧾 Os Marcos do Git (Seu Histórico Final)<a class="headerlink" href="#os-marcos-do-git-seu-historico-final" title="Permanent link">&para;</a></h3>
 <p>Este tutorial é também um exercício de <strong>desenvolvimento incremental com Git</strong>. Ao final, seu <code>git log --oneline</code> deve contar esta história (do mais recente para o mais antigo):</p>

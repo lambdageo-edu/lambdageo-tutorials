@@ -1668,29 +1668,31 @@
 <a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">              </span><span class="kr">deriving</span><span class="w"> </span><span class="p">(</span><span class="kt">Eq</span><span class="p">,</span><span class="w"> </span><span class="kt">Ord</span><span class="p">,</span><span class="w"> </span><span class="kt">Show</span><span class="p">)</span>
 </code></pre></div>
 <p>Para cada tipo de JSON, fornecemos um construtor de valor distinto. Alguns desses construtores possuem parâmetros: se quisermos construir uma string JSON, devemos fornecer um valor <code>String</code> como argumento para o construtor <code>JString</code>.</p>
-<p>Aqui está a versão atualizada dessa seção do tutorial, incluindo o passo crucial de registrar o novo módulo no arquivo <code>.cabal</code> antes de carregar o REPL. </p>
-<p>Você pode substituir o parágrafo original por este bloco:</p>
-<hr />
 <p>Para começar a experimentar esse código, siga estes passos:</p>
 <ol>
 <li>Salve o arquivo <code>SimpleJSON.hs</code> no seu editor.</li>
-<li><strong>Atualize o arquivo <code>.cabal</code> do seu projeto:</strong> como acabamos de criar um <em>novo arquivo</em> (um novo módulo), precisamos informar ao Cabal sobre sua existência. Abra o arquivo <code>.cabal</code> do seu projeto (ex: <code>hs2json.cabal</code>) e adicione <code>SimpleJSON</code> à lista de <code>exposed-modules</code> na seção <code>library</code>:
+<li>
+<p><strong>Atualize o arquivo <code>.cabal</code> do seu projeto:</strong> como acabamos de criar um <em>novo arquivo</em> (um novo módulo), precisamos informar ao Cabal sobre sua existência. Abra o <code>hs2json.cabal</code> e adicione <code>SimpleJSON</code> à lista de <code>exposed-modules</code> da seção <code>library</code>, <strong>antes</strong> do <code>MyLib</code> (que ainda é usado pelo <code>app/Main.hs</code> gerado):
    <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>library
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    exposed-modules:  SimpleJSON  -- &lt;--- Adicionado aqui
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    hs-source-dirs:   src
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    build-depends:    base &gt;=4.14
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    default-language: Haskell2010
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    import:           warnings
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    exposed-modules:  SimpleJSON, MyLib
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    build-depends:    base ^&gt;=4.17.2.0
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    hs-source-dirs:   src
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    default-language: Haskell2010
 </code></pre></div>
-      <em>(Se você já tiver outros módulos, como <code>MyLib</code>, basta adicioná-los separados por vírgula ou em linhas novas nesta mesma lista).</em></li>
-<li>Alterne para uma janela de terminal e carregue o projeto no REPL executando o seguinte comando na raiz do projeto:</li>
+   <em>(Mantenha o <code>build-depends</code> que o <code>cabal init</code> gerou: a faixa de versão do <code>base</code> depende do seu GHC.)</em></p>
+</li>
+<li>
+<p>Alterne para uma janela de terminal e carregue o projeto no REPL executando o seguinte comando na raiz do projeto:</p>
+</li>
 </ol>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>$ cabal repl
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>Resolving dependencies...
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>Build profile: -w ghc-9.4.7 -O1
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>...
 <a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>GHCi, version 9.4.7: https://www.haskell.org/ghc/  :? for help
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>[1 of 2] Compiling SimpleJSON       ( src/SimpleJSON.hs, interpreted )
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>[2 of 2] Compiling Main             ( app/Main.hs, interpreted )
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>[1 of 2] Compiling MyLib            ( src/MyLib.hs, interpreted )
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>[2 of 2] Compiling SimpleJSON       ( src/SimpleJSON.hs, interpreted )
 <a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>Ok, two modules loaded.
 <a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>ghci&gt; JString "foo"
 <a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>JString "foo"
@@ -1699,7 +1701,19 @@
 <a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>ghci&gt; :type JBool True
 <a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>JBool True :: JValue
 </code></pre></div>
-<p><em>(A saída exata do cabeçalho varia com as versões, mas o prompt e o comportamento são estes.)</em></p>
+<p><em>(A saída exata do cabeçalho varia com as versões, mas o prompt e o comportamento são estes. Repare que o <code>cabal repl</code> carrega apenas a <strong>biblioteca</strong>; o <code>app/Main.hs</code> não entra no REPL.)</em></p>
+<div class="admonition tip">
+<p class="admonition-title">Avisos <code>-Wtype-defaults</code> no GHCi</p>
+<p>Como o <code>-Wall</code> vale também dentro do <code>cabal repl</code>, expressões como <code>truncate 5.8</code> vêm acompanhadas de vários avisos <code>Defaulting the type variable...</code> antes do resultado. Eles são inofensivos; para silenciá-los durante a sessão, digite <code>:set -Wno-type-defaults</code>.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Comentários no <code>.cabal</code></p>
+<p>No <code>.cabal</code>, um comentário (<code>--</code>) só vale <strong>no início da linha</strong>. Escrever <code>exposed-modules: SimpleJSON  -- adicionado</code> no fim da linha faz o Cabal recusar o arquivo com <code>unexpected '-'</code>.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Por que <code>SimpleJSON</code> primeiro?</p>
+<p>O <code>cabal repl</code> carrega todos os módulos da lista, mas o prompt do GHCi só enxerga diretamente o <strong>primeiro</strong>. Com <code>MyLib</code> na frente, <code>JString "foo"</code> daria <code>Data constructor not in scope</code>. Se isso acontecer, basta digitar <code>import SimpleJSON</code> no GHCi.</p>
+</div>
 <p>Podemos ver como usar um construtor para pegar um valor Haskell normal e transformá-lo em um <code>JValue</code>. Para fazer o inverso, usamos casamento de padrões. Aqui está uma função que podemos adicionar ao <code>SimpleJSON.hs</code>, que irá extrair uma string de um valor JSON para nós. Se o valor JSON realmente contiver uma string, nossa função envolverá a string com o construtor <code>Just</code>. Caso contrário, retornará <code>Nothing</code>.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1">-- src/SimpleJSON.hs</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nf">getString</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">JValue</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">Maybe</span><span class="w"> </span><span class="kt">String</span>
@@ -1708,14 +1722,14 @@
 </code></pre></div>
 <p>Quando salvamos o arquivo de código-fonte modificado, podemos recarregá-lo no <code>cabal repl</code> com o comando <code>:r</code> e testar a nova definição:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>ghci&gt; :r
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>[1 of 2] Compiling SimpleJSON       ( src/SimpleJSON.hs, interpreted )
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>[2 of 2] Compiling SimpleJSON       ( src/SimpleJSON.hs, interpreted )
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>Ok, two modules loaded.
 <a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>ghci&gt; getString (JString "hello")
 <a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>Just "hello"
 <a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>ghci&gt; getString (JNumber 3)
 <a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>Nothing
 </code></pre></div>
-<p>A seguir, mais algumas funções acessoras. Desta vez incluímos as assinaturas de tipo — o GHC as infere sozinho, mas escrevê-las é uma boa prática (e, quando ativarmos <code>-Wall</code> no <code>.cabal</code>, mais adiante, o GHC vai nos lembrar disso com um aviso caso esqueçamos):</p>
+<p>A seguir, mais algumas funções acessoras. Desta vez incluímos as assinaturas de tipo — o GHC as infere sozinho, mas escrevê-las é uma boa prática (e, como o <code>-Wall</code> já está ativo no <code>.cabal</code>, o GHC nos lembra disso com um aviso <code>-Wmissing-signatures</code> caso esqueçamos):</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1">-- src/SimpleJSON.hs</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nf">getInt</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">JValue</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">Maybe</span><span class="w"> </span><span class="kt">Int</span>
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="nf">getInt</span><span class="w"> </span><span class="p">(</span><span class="kt">JNumber</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kt">Just</span><span class="w"> </span><span class="p">(</span><span class="n">truncate</span><span class="w"> </span><span class="n">n</span><span class="p">)</span>
@@ -1777,9 +1791,10 @@
 <p>Para compilar o projeto e executar o binário, na raiz do projeto:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>$ cabal build
 <a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>$ cabal run
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>someFunc
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>Hello, Haskell!
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>someFunc
 </code></pre></div>
-<p><em>(O <code>someFunc</code> vem do <code>src/MyLib.hs</code> gerado pelo assistente do <code>cabal init</code> — é o "hello world" do esqueleto.)</em></p>
+<p><em>(As duas linhas vêm do esqueleto gerado pelo <code>cabal init</code>: a primeira, do <code>app/Main.hs</code>; a segunda, da função <code>someFunc</code> do <code>src/MyLib.hs</code>.)</em></p>
 <p>Agora que compilamos com sucesso nossa biblioteca mínima, vamos começar a escrever a biblioteca proposta aqui. Antes de seguir, <strong>apague o arquivo <code>src/MyLib.hs</code></strong>, já que não o usaremos mais, e então modifique o <code>app/Main.hs</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1">-- app/Main.hs</span>
 <a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="kr">module</span><span class="w"> </span><span class="nn">Main</span><span class="w"> </span><span class="p">(</span><span class="nf">main</span><span class="p">)</span><span class="w"> </span><span class="kr">where</span>
@@ -1791,12 +1806,13 @@
 </code></pre></div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p><strong>Diferente do fluxo com hpack: aqui você precisa editar o <code>.cabal</code> à mão.</strong> Sem essa camada de conveniência, o Cabal não descobre <code>SimpleJSON.hs</code> sozinho — é preciso trocar <code>MyLib</code> por <code>SimpleJSON</code> (e remover a referência a <code>MyLib</code>) na lista <code>exposed-modules:</code> da seção <code>library</code> do <code>hs2json.cabal</code>:
+<p><strong>Diferente do fluxo com hpack: aqui você precisa editar o <code>.cabal</code> à mão.</strong> Como apagamos o <code>MyLib.hs</code>, é preciso <strong>remover</strong> <code>MyLib</code> da lista <code>exposed-modules:</code> da seção <code>library</code> do <code>hs2json.cabal</code> — senão o <code>cabal build</code> reclama que não encontra o módulo:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>library
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>    exposed-modules:  SimpleJSON
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>    hs-source-dirs:   src
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>    build-depends:    base &gt;=4.14
-<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>    default-language: Haskell2010
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>    import:           warnings
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>    exposed-modules:  SimpleJSON
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>    build-depends:    base ^&gt;=4.17.2.0
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>    hs-source-dirs:   src
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>    default-language: Haskell2010
 </code></pre></div>
 A partir de agora, <strong>todo módulo novo que criarmos em <code>src/</code> precisa entrar nessa lista</strong> — é o preço de não ter o hpack detectando por nós. Em compensação, o arquivo <code>.cabal</code> é sempre exatamente o que está sendo compilado, sem uma etapa de geração no meio.</p>
 </div>

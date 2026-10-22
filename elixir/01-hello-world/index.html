@@ -1886,7 +1886,7 @@
 <p>➡️ O <code>use</code> <strong>não é herança</strong>, mas <strong>geração de código</strong>: ele deixa o módulo pronto para o ecossistema Phoenix. No nosso projeto, ele também já <strong>importa os componentes de UI</strong> (<code>&lt;.form&gt;</code>, <code>&lt;.input&gt;</code>, <code>&lt;.button&gt;</code>) e disponibiliza o alias <code>Layouts</code> — vamos usá-los a partir da Fase 4.</p>
 <h3 id="2-o-papel-do-impl-true">2. O papel do <code>@impl true</code><a class="headerlink" href="#2-o-papel-do-impl-true" title="Permanent link">&para;</a></h3>
 <p>O marcador <code>@impl true</code> vem antes de funções que <strong>implementam callbacks</strong> de um <strong>comportamento</strong> (<em>behaviour</em>). Um <em>behaviour</em> em Elixir é parecido com uma <strong>interface</strong> em linguagens orientadas a objetos: ele define <strong>quais funções um módulo deve implementar</strong>.</p>
-<p>O LiveView espera que cada módulo tenha, no mínimo, <code>mount/3</code> e <code>render/1</code>. Quando você escreve <code>@impl true</code>, está dizendo ao compilador: <em>"esta função é a implementação esperada pelo comportamento do LiveView"</em>.</p>
+<p>O comportamento do LiveView define callbacks como <code>mount/3</code>, <code>render/1</code> e <code>handle_event/3</code> (o <code>mount/3</code> é opcional; o <code>render/1</code> só pode faltar se houver um arquivo de template <code>.html.heex</code> ao lado do módulo). Quando você escreve <code>@impl true</code>, está dizendo ao compilador: <em>"esta função é a implementação esperada pelo comportamento do LiveView"</em>.</p>
 <table>
 <thead>
 <tr>

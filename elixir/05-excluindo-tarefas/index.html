@@ -1886,9 +1886,9 @@
 <h2 id="passo-52-hora-do-erro-e-da-descoberta">💥 Passo 5.2: Hora do Erro (e da Descoberta)<a class="headerlink" href="#passo-52-hora-do-erro-e-da-descoberta" title="Permanent link">&para;</a></h2>
 <p>Salve o arquivo. Os botões "X" aparecem. Agora <strong>clique em um deles</strong> e olhe o terminal:</p>
 <blockquote>
-<p>❌ <code>** (UndefinedFunctionError) ... no function clause matching in ElixirTodoListWeb.TodoLive.handle_event/3</code> (ou erro similar)</p>
+<p>❌ <code>** (FunctionClauseError) no function clause matching in ElixirTodoListWeb.TodoLive.handle_event/3</code></p>
 </blockquote>
-<p>O Phoenix está certo: enviamos o evento <code>"delete"</code>, mas <strong>nenhuma cláusula de <code>handle_event</code> combina com ele</strong> — o pattern matching não encontrou destino. Igualzinho ao "texto que desaparece" da Fase 2: evento sem tratador derruba (e reinicia) o processo.</p>
+<p>O Phoenix está certo: enviamos o evento <code>"delete"</code>, mas <strong>nenhuma cláusula de <code>handle_event</code> combina com ele</strong> — o pattern matching não encontrou destino. Igualzinho ao "texto que desaparece" da Fase 2: evento sem tratador derruba o processo, e o navegador reconecta com um novo.</p>
 <h2 id="passo-53-implementando-o-handle_eventdelete">⚙️ Passo 5.3: Implementando o <code>handle_event("delete", ...)</code><a class="headerlink" href="#passo-53-implementando-o-handle_eventdelete" title="Permanent link">&para;</a></h2>
 <p>Adicione esta função <strong>logo abaixo</strong> do <code>handle_event("save_task", ...)</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="w">  </span><span class="na">@impl</span><span class="w"> </span><span class="no">true</span>

@@ -441,7 +441,7 @@
   <a href="#1-portas-p-mapeamento-host-container" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🔍 1. Portas (p): Mapeamento Host ↔ Container
+        🔍 1. Portas (-p): Mapeamento Host ↔ Container
       
     </span>
   </a>
@@ -452,7 +452,7 @@
   <a href="#2-variaveis-de-ambiente-e-injecao-configuracao" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🔍 2. Variáveis de Ambiente (e): Injeção ≠ Configuração
+        🔍 2. Variáveis de Ambiente (-e): Injeção ≠ Configuração
       
     </span>
   </a>
@@ -496,7 +496,7 @@
   <a href="#3-redes-dns-interno-network-service-discovery-manual" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🔍 3. Redes &amp; DNS Interno (-network): Service Discovery Manual
+        🔍 3. Redes &amp; DNS Interno (--network): Service Discovery Manual
       
     </span>
   </a>
@@ -1751,7 +1751,7 @@
 <p>Se precisar usar PowerShell, substitua <code>curl -sI</code> por <code>Invoke-WebRequest -Uri http://localhost:8080 -Method Head</code>.</p>
 <p><img alt="image.png" src="../img/docker-cli-image1.png" /></p>
 <hr />
-<h3 id="1-portas-p-mapeamento-host-container">🔍 1. Portas (<code>p</code>): Mapeamento Host ↔ Container<a class="headerlink" href="#1-portas-p-mapeamento-host-container" title="Permanent link">&para;</a></h3>
+<h3 id="1-portas-p-mapeamento-host-container">🔍 1. Portas (<code>-p</code>): Mapeamento Host ↔ Container<a class="headerlink" href="#1-portas-p-mapeamento-host-container" title="Permanent link">&para;</a></h3>
 <p><strong>O que o <code>-p</code> realmente faz?</strong></p>
 <p>A flag <code>-p HOST:CONTAINER</code> cria uma regra no <strong>iptables/NAT do Docker Engine</strong> que redireciona tráfego da interface de rede do host para a interface interna do container. O container continua ouvindo na porta original; o Docker faz o "tradutor" de portas.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># 1. Sobe um Nginx mapeando porta 8080 (host) → 80 (container)</span>
@@ -1802,7 +1802,7 @@
 </li>
 </ol>
 <hr />
-<h3 id="2-variaveis-de-ambiente-e-injecao-configuracao">🔍 2. Variáveis de Ambiente (<code>e</code>): Injeção ≠ Configuração<a class="headerlink" href="#2-variaveis-de-ambiente-e-injecao-configuracao" title="Permanent link">&para;</a></h3>
+<h3 id="2-variaveis-de-ambiente-e-injecao-configuracao">🔍 2. Variáveis de Ambiente (<code>-e</code>): Injeção ≠ Configuração<a class="headerlink" href="#2-variaveis-de-ambiente-e-injecao-configuracao" title="Permanent link">&para;</a></h3>
 <p><strong>O que o <code>-e</code> realmente faz?</strong></p>
 <p>Ele injeta pares <code>CHAVE=VALOR</code> no ambiente do processo principal (<code>PID 1</code>) do container. <strong>Atenção crucial:</strong> o Docker <em>não configura seu aplicativo automaticamente</em>. Quem decide ler e usar essas variáveis é o código, o framework ou o script de entrada (<code>entrypoint.sh</code>) da imagem.</p>
 <h3 id="exemplo-1-postgresql-funciona-de-fabrica">✅ Exemplo 1: PostgreSQL (funciona "de fábrica")<a class="headerlink" href="#exemplo-1-postgresql-funciona-de-fabrica" title="Permanent link">&para;</a></h3>
@@ -1861,7 +1861,7 @@
 </li>
 </ol>
 <hr />
-<h3 id="3-redes-dns-interno-network-service-discovery-manual">🔍 3. Redes &amp; DNS Interno (<code>-network</code>): Service Discovery Manual<a class="headerlink" href="#3-redes-dns-interno-network-service-discovery-manual" title="Permanent link">&para;</a></h3>
+<h3 id="3-redes-dns-interno-network-service-discovery-manual">🔍 3. Redes &amp; DNS Interno (<code>--network</code>): Service Discovery Manual<a class="headerlink" href="#3-redes-dns-interno-network-service-discovery-manual" title="Permanent link">&para;</a></h3>
 <p><strong>Como os containers se comunicam entre si?</strong></p>
 <p>Por padrão, o Docker cria uma rede virtual chamada <code>bridge</code> (subnet <code>172.17.0.0/16</code>). Containers nela conseguem acessar a internet e se comunicar via IP, mas <strong>não resolvem nomes automaticamente</strong> (ex: <code>ping meu-container</code> falha). Para descoberta automática de serviços, você precisa criar uma <strong>rede customizada</strong>.</p>
 <h3 id="exemplo-1-rede-padrao-bridge">❌ Exemplo 1: Rede padrão (<code>bridge</code>)<a class="headerlink" href="#exemplo-1-rede-padrao-bridge" title="Permanent link">&para;</a></h3>
@@ -1926,9 +1926,10 @@
 <hr />
 <h3 id="4-debug-inspecao-o-kit-de-sobrevivencia">🔍 4. Debug &amp; Inspeção: O Kit de Sobrevivência<a class="headerlink" href="#4-debug-inspecao-o-kit-de-sobrevivencia" title="Permanent link">&para;</a></h3>
 <p><strong>Regra de Ouro:</strong> <code>logs</code> primeiro → <code>ps</code> depois → <code>exec</code> por último. Nunca tente adivinhar; deixe o container te dizer o que está errado.</p>
-<p>⚠️ <strong>Antes de continuar:</strong> o container <code>web</code> foi parado lá na seção 1 (passo 3) e nunca voltou a rodar. Religue-o para os exemplos abaixo funcionarem como documentado:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>docker<span class="w"> </span>start<span class="w"> </span>web
-<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>docker<span class="w"> </span>ps<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>web<span class="w">  </span><span class="c1"># → confirme STATUS "Up"</span>
+<p>⚠️ <strong>Antes de continuar:</strong> o container <code>web</code> foi parado lá na seção 1 (passo 3) e nunca voltou a rodar. E a porta 8080 que ele usava ficou com o <code>web2</code>. Remova o <code>web2</code> e religue o <code>web</code> para os exemplos abaixo funcionarem como documentado:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>docker<span class="w"> </span>rm<span class="w"> </span>-f<span class="w"> </span>web2<span class="w">   </span><span class="c1"># libera a porta 8080</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>docker<span class="w"> </span>start<span class="w"> </span>web
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>docker<span class="w"> </span>ps<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>web<span class="w">  </span><span class="c1"># → confirme STATUS "Up"</span>
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># 1. Logs: primeira linha de defesa</span>
 <a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>docker<span class="w"> </span>logs<span class="w"> </span>web
@@ -1948,7 +1949,7 @@
 <a id="__codelineno-16-16" name="__codelineno-16-16" href="#__codelineno-16-16"></a><span class="c1"># 4. Terminal cirúrgico dentro do container</span>
 <a id="__codelineno-16-17" name="__codelineno-16-17" href="#__codelineno-16-17"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>web<span class="w"> </span>sh
 <a id="__codelineno-16-18" name="__codelineno-16-18" href="#__codelineno-16-18"></a><span class="c1"># → Você está DENTRO do container. Teste manualmente:</span>
-<a id="__codelineno-16-19" name="__codelineno-16-19" href="#__codelineno-16-19"></a><span class="c1">#    curl localhost, cat /etc/hosts, ping api, etc.</span>
+<a id="__codelineno-16-19" name="__codelineno-16-19" href="#__codelineno-16-19"></a><span class="c1">#    wget -qO- localhost, cat /etc/hosts, etc.</span>
 <a id="__codelineno-16-20" name="__codelineno-16-20" href="#__codelineno-16-20"></a><span class="c1"># → Digite 'exit' para sair.</span>
 <a id="__codelineno-16-21" name="__codelineno-16-21" href="#__codelineno-16-21"></a>
 <a id="__codelineno-16-22" name="__codelineno-16-22" href="#__codelineno-16-22"></a><span class="c1"># 5. Ciclo de vida limpo</span>
@@ -1979,16 +1980,18 @@
 <p><strong>Entre no container e teste a rede interna:</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>worker<span class="w"> </span>sh
 <a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="c1"># Dentro do container:</span>
-<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>ping<span class="w"> </span>api<span class="w">          </span><span class="c1"># ✅ Resolve via DNS interno</span>
-<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>curl<span class="w"> </span>http://api<span class="w">   </span><span class="c1"># ✅ Acessa o Nginx do outro container</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>ping<span class="w"> </span>-c<span class="w"> </span><span class="m">2</span><span class="w"> </span>api<span class="w">           </span><span class="c1"># ✅ Resolve via DNS interno</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>wget<span class="w"> </span>-qO-<span class="w"> </span>http://api<span class="w">    </span><span class="c1"># ✅ Acessa o Nginx do outro container</span>
 <a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="nb">exit</span>
 </code></pre></div>
+<p><em>(A imagem <code>alpine</code> não traz o <code>curl</code>; o <code>wget</code> do BusyBox, que já vem nela, faz o mesmo papel aqui.)</em></p>
 </li>
 <li>
 <p><strong>Limpeza segura:</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>docker<span class="w"> </span>system<span class="w"> </span>df<span class="w">            </span><span class="c1"># Espaço usado por Docker</span>
-<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>docker<span class="w"> </span>system<span class="w"> </span>prune<span class="w"> </span>-f<span class="w">      </span><span class="c1"># Remove containers/imagens/networks órfãos (seguro)</span>
-<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="c1"># ⚠️ Nunca use 'prune -a' em produção: remove TUDO não usado, incluindo imagens em uso.</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>docker<span class="w"> </span>system<span class="w"> </span>prune<span class="w"> </span>-f<span class="w">      </span><span class="c1"># Remove containers parados, redes sem uso, imagens "dangling" e cache de build</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="c1"># ⚠️ Cuidado com 'prune -a': ele remove também TODAS as imagens que não estão em uso</span>
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="c1">#    por nenhum container — depois, tudo precisa ser baixado/construído de novo.</span>
 </code></pre></div>
 </li>
 </ol>
@@ -2007,10 +2010,11 @@
 </blockquote>
 <hr />
 <h3 id="limpeza-antes-de-continuar">🧹 Limpeza Antes de Continuar<a class="headerlink" href="#limpeza-antes-de-continuar" title="Permanent link">&para;</a></h3>
-<p>Este bloco criou vários containers e uma rede (<code>web</code>, <code>web2</code>, <code>internal</code>, <code>db</code>, <code>cache</code>, <code>cache2</code>, <code>svc-a</code>, <code>svc-b</code>, <code>api</code>, <code>worker</code>, <code>bad</code>, <code>app-net</code>). Antes de seguir para o próximo capítulo, limpe tudo para começar do zero e evitar conflitos de porta ou nome:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>docker<span class="w"> </span>rm<span class="w"> </span>-f<span class="w"> </span><span class="k">$(</span>docker<span class="w"> </span>ps<span class="w"> </span>-aq<span class="k">)</span>
+<p>Este bloco criou vários containers e uma rede (<code>web</code>, <code>web2</code>, <code>internal</code>, <code>db</code>, <code>cache</code>, <code>cache2</code>, <code>svc-a</code>, <code>svc-b</code>, <code>api</code>, <code>worker</code>, <code>bad</code>, <code>app-net</code>). Antes de seguir para o próximo capítulo, remova-os para começar do zero e evitar conflitos de porta ou nome:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>docker<span class="w"> </span>rm<span class="w"> </span>-f<span class="w"> </span>web<span class="w"> </span>web2<span class="w"> </span>internal<span class="w"> </span>db<span class="w"> </span>cache<span class="w"> </span>cache2<span class="w"> </span>svc-a<span class="w"> </span>svc-b<span class="w"> </span>api<span class="w"> </span>worker<span class="w"> </span>bad
 <a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>docker<span class="w"> </span>network<span class="w"> </span>rm<span class="w"> </span>app-net
 </code></pre></div>
+<p><em>(Evite o atalho <code>docker rm -f $(docker ps -aq)</code>: ele apaga <strong>todos</strong> os containers da máquina, inclusive os de outros projetos seus.)</em></p>
 <blockquote></blockquote>
 
 

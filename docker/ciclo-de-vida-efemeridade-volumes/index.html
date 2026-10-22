@@ -1836,12 +1836,12 @@
 <ul>
 <li>Desativar a conversão de path no comando:</li>
 </ul>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>MSYS_NO_PATHCONV=1 docker exec &lt;container&gt;cat /data/log.txt
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>MSYS_NO_PATHCONV=1 docker exec &lt;container&gt; cat /data/log.txt
 </code></pre></div>
 <ul>
 <li>Ou usar caminho com escape:</li>
 </ul>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>docker exec &lt;container&gt;cat //data/log.txt
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>docker exec &lt;container&gt; cat //data/log.txt
 </code></pre></div>
 <h3 id="observacao">📌 Observação<a class="headerlink" href="#observacao" title="Permanent link">&para;</a></h3>
 <p>Esse ajuste é necessário apenas no Windows com Git Bash. Em ambientes Linux ou WSL, o comando funciona normalmente sem modificações.</p>
@@ -1890,7 +1890,7 @@
 <a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>bind-test<span class="w"> </span>cat<span class="w"> </span>/dados/arquivo.txt
 <a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="c1"># → persiste no host ✅</span>
 </code></pre></div>
-<p>⚠️ <strong>Cuidado:</strong> Bind mounts herdam permissões do host. No Linux, se o container roda como <code>root</code> e você como <code>user 1000</code>, pode dar <code>Permission denied</code>. Use <code>:z</code>/<code>:Z</code> ou ajuste <code>uid/gid</code> em produção.</p>
+<p>⚠️ <strong>Cuidado:</strong> Bind mounts herdam permissões do host. No Linux, se o container roda como <code>root</code> e você como <code>user 1000</code>, os arquivos criados pelo container ficam com dono <code>root</code> no seu disco (e você pode levar <code>Permission denied</code> ao editá-los). Ajuste o usuário do container (<code>--user $(id -u):$(id -g)</code>). Em sistemas com SELinux (Fedora, RHEL), use também os sufixos <code>:z</code>/<code>:Z</code>, que reetiquetam a pasta para o container poder acessá-la.</p>
 <h3 id="b-named-volume-gerenciado-pelo-docker">🔹 B. Named Volume (Gerenciado pelo Docker)<a class="headerlink" href="#b-named-volume-gerenciado-pelo-docker" title="Permanent link">&para;</a></h3>
 <p>O Docker cria e gerencia o armazenamento em <code>/var/lib/docker/volumes/</code>. Ideal para <strong>bancos, caches, produção</strong>.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># 1. Crie volume gerenciado</span>
@@ -1953,16 +1953,17 @@
 <li>
 <p><strong>Veja o filesystem mudando:</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>tmp<span class="w"> </span>ls<span class="w"> </span>/
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>tmp<span class="w"> </span>mkdir<span class="w"> </span>-p<span class="w"> </span>/app<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"oi"</span><span class="w"> </span>&gt;<span class="w"> </span>/app/test.txt
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>tmp<span class="w"> </span>ls<span class="w"> </span>/app
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>tmp<span class="w"> </span>sh<span class="w"> </span>-c<span class="w"> </span><span class="s1">'mkdir -p /app &amp;&amp; echo "oi" &gt; /app/test.txt'</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>tmp<span class="w"> </span>ls<span class="w"> </span>/app<span class="w">  </span><span class="c1"># → test.txt</span>
 <a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>docker<span class="w"> </span>rm<span class="w"> </span>-f<span class="w"> </span>tmp
 <a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>--name<span class="w"> </span>tmp<span class="w"> </span>alpine<span class="w"> </span>sleep<span class="w"> </span><span class="m">300</span>
-<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>tmp<span class="w"> </span>ls<span class="w"> </span>/app<span class="w">  </span><span class="c1"># → (vazio, filesystem resetado)</span>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>tmp<span class="w"> </span>ls<span class="w"> </span>/app<span class="w">  </span><span class="c1"># → ls: /app: No such file or directory (filesystem resetado)</span>
 </code></pre></div>
+<p><em>(O <code>sh -c '...'</code> é necessário: sem ele, o <code>&gt;</code> seria interpretado pelo <strong>seu</strong> terminal, que tentaria criar <code>/app/test.txt</code> no host.)</em></p>
 </li>
 <li>
 <p><strong>Compare permissões:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>ls<span class="w"> </span>-la<span class="w"> </span>~/docker-demo/vol-host/
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>ls<span class="w"> </span>-la<span class="w"> </span>docker-demo/vol-host/
 <a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>bind-test<span class="w"> </span>ls<span class="w"> </span>-la<span class="w"> </span>/dados/
 <a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="c1"># → Note como uid/gid podem divergir entre host e container</span>
 </code></pre></div>
@@ -1979,7 +1980,7 @@
 </code></pre></div>
 <hr />
 <h3 id="limpeza-antes-de-continuar">🧹 Limpeza Antes de Continuar<a class="headerlink" href="#limpeza-antes-de-continuar" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>docker<span class="w"> </span>rm<span class="w"> </span>-f<span class="w"> </span><span class="k">$(</span>docker<span class="w"> </span>ps<span class="w"> </span>-aq<span class="k">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>docker<span class="w"> </span>rm<span class="w"> </span>-f<span class="w"> </span>tmp<span class="w"> </span>bind-test<span class="w"> </span>db-test<span class="w"> </span><span class="m">2</span>&gt;/dev/null
 <a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>docker<span class="w"> </span>volume<span class="w"> </span>rm<span class="w"> </span>pg_data<span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
 </code></pre></div>
 

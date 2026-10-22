@@ -1696,7 +1696,7 @@
 
 
 <h1 id="docker-docker-compose-cheat-sheet">🐳 DOCKER &amp; DOCKER COMPOSE – CHEAT SHEET<a class="headerlink" href="#docker-docker-compose-cheat-sheet" title="Permanent link">&para;</a></h1>
-<p><em>(Encontro 1 | Imprima ou mantenha aberto na segunda tela)</em></p>
+<p><em>(Imprima ou mantenha aberto na segunda tela)</em></p>
 <hr />
 <h2 id="conceitos-fundamentais">🔑 CONCEITOS FUNDAMENTAIS<a class="headerlink" href="#conceitos-fundamentais" title="Permanent link">&para;</a></h2>
 <table>
@@ -1779,7 +1779,7 @@
 <td><code>services: svc:</code></td>
 </tr>
 <tr>
-<td><code>--depends-on svc</code></td>
+<td><em>(sem equivalente: você roda na ordem certa)</em></td>
 <td><code>depends_on: ["svc"]</code></td>
 </tr>
 </tbody>
@@ -1874,7 +1874,7 @@
 <tr>
 <td></td>
 <td><code>docker system prune -f</code></td>
-<td>Remove containers/imagens/networks órfãos (seguro)</td>
+<td>Remove containers parados, redes sem uso, imagens "dangling" e cache de build</td>
 </tr>
 </tbody>
 </table>

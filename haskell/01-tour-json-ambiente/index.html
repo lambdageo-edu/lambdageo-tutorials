@@ -1726,22 +1726,42 @@ O runtime do GHC já depende do GMP, então normalmente já está instalado; fal
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>mkdir<span class="w"> </span>hs2json<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>hs2json
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>cabal<span class="w"> </span>init<span class="w"> </span>--interactive
 </code></pre></div>
-<p>Ele faz uma série de perguntas — nome do pacote (<code>hs2json</code>), versão, se você quer uma biblioteca, um executável e uma suíte de testes (responda *<em>3</em> para ele incluir executavel e biblioteca), licença, linguagem. Ao final, a estrutura gerada é:</p>
+<p>Ele faz uma série de perguntas — nome do pacote (<code>hs2json</code>), versão, o que o pacote vai construir (responda <strong>3</strong>, <em>Library and Executable</em>, para incluir biblioteca e executável), se deve gerar uma suíte de testes (responda <strong>sim</strong>: vamos usá-la na Parte 2), licença, linguagem. Ao final, a estrutura gerada é:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>hs2json/
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>├── hs2json.cabal     👈 a descrição do pacote (nome, versão, dependências, módulos)
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>├── src/
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>│   └── MyLib.hs       👈 a biblioteca (código reutilizável)
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>├── app/
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>│   └── Main.hs         👈 o executável (o programa em si)
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>├── CHANGELOG.md
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>├── src/
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>│   └── MyLib.hs       👈 a biblioteca (código reutilizável)
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>├── app/
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>│   └── Main.hs        👈 o executável (o programa em si)
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>└── test/
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>    └── Main.hs        👈 a suíte de testes (ainda vazia)
 </code></pre></div>
+<p>Abra o <code>hs2json.cabal</code> e repare em dois detalhes que usaremos ao longo do tutorial:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>common warnings
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    ghc-options: -Wall
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>library
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    import:           warnings
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>    exposed-modules:  MyLib
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>    ...
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>executable hs2json
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>    import:           warnings
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>    ...
+</code></pre></div>
+<ul>
+<li>A seção <code>common warnings</code> liga a flag <strong><code>-Wall</code></strong> (todos os avisos do GHC), e cada componente a importa com <code>import: warnings</code>. Ou seja: <strong>os avisos já estão ativos desde o início</strong> — veremos vários deles, e eles não impedem a compilação.</li>
+<li>O executável se chama <code>hs2json</code> (o mesmo nome do pacote), e a lista <code>exposed-modules:</code> da biblioteca começa só com <code>MyLib</code>.</li>
+</ul>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p><strong>Sem <code>package.yaml</code>:</strong> o <code>.cabal</code> é o único arquivo de configuração — sem a camada <code>package.yaml</code>/hpack de outras ferramentas. Isso tem um efeito prático importante: <strong>o Cabal não detecta módulos novos sozinho</strong>. Quando criarmos <code>SimpleJSON.hs</code>, <code>Prettify.hs</code> etc. dentro de <code>src/</code>, precisaremos adicionar cada um à lista <code>exposed-modules:</code> do <code>hs2json.cabal</code> manualmente — veremos isso já no próximo capítulo.</p>
 </div>
 <p>Os três comandos que usaremos o tempo todo:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>cabal<span class="w"> </span>build<span class="w">          </span><span class="c1"># compila o projeto</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>cabal<span class="w"> </span>run<span class="w">             </span><span class="c1"># compila (se preciso) e executa o executável</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>cabal<span class="w"> </span>repl<span class="w">            </span><span class="c1"># abre o REPL com os módulos do projeto carregados</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>cabal<span class="w"> </span>build<span class="w">          </span><span class="c1"># compila o projeto</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>cabal<span class="w"> </span>run<span class="w">             </span><span class="c1"># compila (se preciso) e executa o executável</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>cabal<span class="w"> </span>repl<span class="w">            </span><span class="c1"># abre o REPL com os módulos do projeto carregados</span>
 </code></pre></div>
 <p>Na <strong>primeira</strong> execução de <code>cabal build</code>, o Cabal busca o índice de pacotes do Hackage (se ainda não tiver feito isso — <code>cabal update</code>) e baixa as dependências — pode demorar um pouco.</p>
 

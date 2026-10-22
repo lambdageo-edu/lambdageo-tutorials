@@ -1763,7 +1763,7 @@
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">              </span><span class="n">id</span><span class="o">=</span><span class="p">{</span><span class="s2">"task-</span><span class="si">#{</span><span class="n">task</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">              </span><span class="n">class</span><span class="o">=</span><span class="s2">"flex justify-between items-center p-3 border-b"</span>
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">            </span><span class="o">&gt;</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">              </span><span class="o">&lt;</span><span class="err">%</span><span class="w"> </span><span class="n">task_form</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">Task</span><span class="o">.</span><span class="n">changeset</span><span class="p">(</span><span class="n">task</span><span class="p">,</span><span class="w"> </span><span class="p">%{})</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">to_form</span><span class="p">()</span><span class="w"> </span><span class="err">%</span><span class="o">&gt;</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">              </span><span class="o">&lt;</span><span class="err">%</span><span class="w"> </span><span class="n">task_form</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">Task</span><span class="o">.</span><span class="n">changeset</span><span class="p">(</span><span class="n">task</span><span class="p">,</span><span class="w"> </span><span class="p">%{})</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">to_form</span><span class="p">(</span><span class="ss">id</span><span class="p">:</span><span class="w"> </span><span class="s2">"task-</span><span class="si">#{</span><span class="n">task</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span><span class="w"> </span><span class="err">%</span><span class="o">&gt;</span>
 <a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
 <a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">              </span><span class="o">&lt;.</span><span class="n">form</span>
 <a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">                </span><span class="k">for</span><span class="o">=</span><span class="p">{</span><span class="n">task_form</span><span class="p">}</span>
@@ -1808,7 +1808,7 @@
 <tbody>
 <tr>
 <td><code>&lt;% task_form = ... %&gt;</code></td>
-<td>Cria uma variável temporária: o formulário individual <strong>daquela</strong> tarefa (um changeset "vazio" sobre a tarefa existente, convertido com <code>to_form</code>).</td>
+<td>Cria uma variável temporária: o formulário individual <strong>daquela</strong> tarefa (um changeset "vazio" sobre a tarefa existente, convertido com <code>to_form</code>). O <code>id: "task-#{task.id}"</code> dá a cada formulário um prefixo próprio; sem ele, todos os checkboxes teriam o mesmo <code>id</code> HTML (<code>task_completed</code>), e o LiveView reclamaria de IDs duplicados no console do navegador.</td>
 </tr>
 <tr>
 <td><code>id={"task-#{task.id}"}</code></td>
@@ -1995,7 +1995,7 @@
 <a id="__codelineno-5-93" name="__codelineno-5-93" href="#__codelineno-5-93"></a><span class="sh">              id={"task-#{task.id}"}</span>
 <a id="__codelineno-5-94" name="__codelineno-5-94" href="#__codelineno-5-94"></a><span class="sh">              class="flex justify-between items-center p-3 border-b"</span>
 <a id="__codelineno-5-95" name="__codelineno-5-95" href="#__codelineno-5-95"></a><span class="sh">            &gt;</span>
-<a id="__codelineno-5-96" name="__codelineno-5-96" href="#__codelineno-5-96"></a><span class="sh">              &lt;% task_form = Task.changeset(task, %{}) |&gt; to_form() %&gt;</span>
+<a id="__codelineno-5-96" name="__codelineno-5-96" href="#__codelineno-5-96"></a><span class="sh">              &lt;% task_form = Task.changeset(task, %{}) |&gt; to_form(id: "task-#{task.id}") %&gt;</span>
 <a id="__codelineno-5-97" name="__codelineno-5-97" href="#__codelineno-5-97"></a>
 <a id="__codelineno-5-98" name="__codelineno-5-98" href="#__codelineno-5-98"></a><span class="sh">              &lt;.form</span>
 <a id="__codelineno-5-99" name="__codelineno-5-99" href="#__codelineno-5-99"></a><span class="sh">                for={task_form}</span>

@@ -1707,13 +1707,13 @@ Nada é mais frustrante do que descobrir, no meio da Fase 3, que o Node.js não 
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>node<span class="w"> </span>-v<span class="w">               </span><span class="c1"># Precisa ser 18 ou superior</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>git<span class="w"> </span>--version<span class="w">         </span><span class="c1"># Qualquer versão recente</span>
 </code></pre></div>
-<blockquote>
-<p>[!NOTE]
-<strong>Sobre o clj vs. clojure:</strong>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>Sobre o clj vs. clojure:</strong>
 O utilitário <code>clj</code> é apenas um script wrapper que tenta executar o Clojure em conjunto com a ferramenta de edição de linha de comando <code>rlwrap</code>. Em alguns sistemas, se o <code>rlwrap</code> não estiver instalado, rodar <code>clj</code> resultará em um erro como:
 <code>Please install rlwrap for command editing or use "clojure" instead.</code>
 Se for o seu caso, não se preocupe! Você não precisa instalar nada a mais. Basta usar o comando <code>clojure</code> no lugar de <code>clj</code> em todo este tutorial (ex: <code>clojure --version</code> para testar a versão, <code>clojure -M:run</code> para rodar o backend e <code>clojure</code> para REPL). Ambos executam exatamente o mesmo compilador.</p>
-</blockquote>
+</div>
 <p><strong>Resultado Esperado:</strong> Cada comando deve imprimir uma versão. Se algum deles der <code>command not found</code>:</p>
 <ul>
 <li><strong>Java:</strong> instale um JDK (ex: <a href="https://adoptium.net/">Adoptium/Temurin</a>).</li>
@@ -1821,7 +1821,7 @@ Até agora, criamos um arquivo (<code>.gitignore</code>) e o Git sabe que ele ex
 </code></pre></div>
 <p><strong>Resultado Esperado:</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>[main (root-commit) a1b2c3d] feat: setup inicial do projeto com .gitignore
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a> 1 file changed, 40 insertions(+)
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a> 1 file changed, 41 insertions(+)
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a> create mode 100644 .gitignore
 </code></pre></div>
 <div class="admonition tip">

@@ -1946,7 +1946,7 @@
 <a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a>
 <a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a><span class="c"># Copia apenas manifestos para instalar só produção</span>
 <a id="__codelineno-5-28" name="__codelineno-5-28" href="#__codelineno-5-28"></a><span class="k">COPY</span><span class="w"> </span>package*.json<span class="w"> </span>./
-<a id="__codelineno-5-29" name="__codelineno-5-29" href="#__codelineno-5-29"></a><span class="k">RUN</span><span class="w"> </span>npm<span class="w"> </span>install<span class="w"> </span>--only<span class="o">=</span>production<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>npm<span class="w"> </span>cache<span class="w"> </span>clean<span class="w"> </span>--force
+<a id="__codelineno-5-29" name="__codelineno-5-29" href="#__codelineno-5-29"></a><span class="k">RUN</span><span class="w"> </span>npm<span class="w"> </span>install<span class="w"> </span>--omit<span class="o">=</span>dev<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>npm<span class="w"> </span>cache<span class="w"> </span>clean<span class="w"> </span>--force
 <a id="__codelineno-5-30" name="__codelineno-5-30" href="#__codelineno-5-30"></a>
 <a id="__codelineno-5-31" name="__codelineno-5-31" href="#__codelineno-5-31"></a><span class="c"># Copia apenas o código compilado do estágio anterior</span>
 <a id="__codelineno-5-32" name="__codelineno-5-32" href="#__codelineno-5-32"></a><span class="k">COPY</span><span class="w"> </span>--from<span class="o">=</span>builder<span class="w"> </span>/app/dist<span class="w"> </span>./dist
@@ -1971,8 +1971,8 @@
 <tbody>
 <tr>
 <td>Tamanho da imagem</td>
-<td>~300 MB</td>
-<td>~50 MB</td>
+<td>base + todas as dependências + fontes</td>
+<td>base + só dependências de produção + <code>dist/</code></td>
 </tr>
 <tr>
 <td>Contém código fonte?</td>
@@ -2074,7 +2074,7 @@
 <a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/app/node_modules</span><span class="w">         </span><span class="c1"># Preserva node_modules do container</span>
 <a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">    </span><span class="nt">environment</span><span class="p">:</span>
 <a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">NODE_ENV=development</span>
-<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">WATCHPACK_POLLING=true</span><span class="w">    </span><span class="c1"># Necessário em WSL2/macOS</span>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CHOKIDAR_USEPOLLING=true</span><span class="w">  </span><span class="c1"># Polling de arquivos (útil em WSL2/macOS)</span>
 <a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"npm"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"run"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"dev"</span><span class="p p-Indicator">]</span><span class="w">  </span><span class="c1"># Override: roda nodemon</span>
 <a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w">    </span><span class="nt">healthcheck</span><span class="p">:</span>
 <a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="w">      </span><span class="nt">disable</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">  </span><span class="c1"># Desabilita em dev para iteração rápida</span>
@@ -2106,7 +2106,9 @@
 <a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="k">EXPOSE</span><span class="w"> </span><span class="s">3000</span>
 <a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>
 <a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="c"># Nodemon reinicia ao detectar mudanças</span>
-<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="k">CMD</span><span class="w"> </span><span class="p">[</span><span class="s2">"nodemon"</span><span class="p">,</span><span class="w"> </span><span class="s2">"--watch"</span><span class="p">,</span><span class="w"> </span><span class="s2">"."</span><span class="p">,</span><span class="w"> </span><span class="s2">"--ext"</span><span class="p">,</span><span class="w"> </span><span class="s2">"js,json"</span><span class="p">,</span><span class="w"> </span><span class="s2">"index.js"</span><span class="p">]</span>
+<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="c"># (-L = "legacy watch", polling: necessário quando o bind mount</span>
+<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="c">#  não propaga eventos de arquivo, como em WSL2/macOS)</span>
+<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a><span class="k">CMD</span><span class="w"> </span><span class="p">[</span><span class="s2">"nodemon"</span><span class="p">,</span><span class="w"> </span><span class="s2">"-L"</span><span class="p">,</span><span class="w"> </span><span class="s2">"--watch"</span><span class="p">,</span><span class="w"> </span><span class="s2">"."</span><span class="p">,</span><span class="w"> </span><span class="s2">"--ext"</span><span class="p">,</span><span class="w"> </span><span class="s2">"js,json"</span><span class="p">,</span><span class="w"> </span><span class="s2">"index.js"</span><span class="p">]</span>
 </code></pre></div>
 <hr />
 <h3 id="docker-composeprodyml-producao">🚀 <code>docker-compose.prod.yml</code> (Produção)<a class="headerlink" href="#docker-composeprodyml-producao" title="Permanent link">&para;</a></h3>
@@ -2169,6 +2171,7 @@
 <a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>APP_VERSION=1.0.0-abc123
 </code></pre></div>
 <h3 id="como-usar">Como usar:<a class="headerlink" href="#como-usar" title="Permanent link">&para;</a></h3>
+<p>Por padrão, o Compose lê o <code>.env</code> da pasta do projeto. Se quiser valores diferentes por ambiente, crie cópias com outros nomes (por exemplo, <code>.env.dev</code> e <code>.env.prod</code>, ambas fora do Git) e escolha uma com <code>--env-file</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># Desenvolvimento</span>
 <a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>docker<span class="w"> </span>compose<span class="w"> </span>--env-file<span class="w"> </span>.env.dev<span class="w"> </span>-f<span class="w"> </span>docker-compose.yml<span class="w"> </span>-f<span class="w"> </span>docker-compose.dev.yml<span class="w"> </span>up<span class="w"> </span>-d
 <a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
@@ -2180,7 +2183,7 @@
 </code></pre></div>
 <p>📌 <strong>Nunca commitar <code>.env</code> com segredos.</strong> Use:</p>
 <ul>
-<li><code>.gitignore</code>: <code>.env</code>, <code>.local</code>, <code>secrets/</code></li>
+<li><code>.gitignore</code>: <code>.env</code>, <code>.env.*</code> (exceto o <code>.env.example</code>), <code>secrets/</code></li>
 <li>CI/CD: secrets do GitHub Actions, GitLab CI, etc.</li>
 <li>Produção: Docker Secrets, HashiCorp Vault, AWS Secrets Manager.</li>
 </ul>
@@ -2201,7 +2204,8 @@
 <a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a>
 <a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a><span class="c1"># 5. Compare tamanhos de imagem</span>
 <a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a>docker<span class="w"> </span>images<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>app
-<a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a><span class="c1"># → dev: ~300MB (com ferramentas) | prod: ~50MB (multi-stage)</span>
+<a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a><span class="c1"># → a de dev é maior (devDependencies, nodemon, código-fonte);</span>
+<a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a><span class="c1">#   a de prod tem só o `dist/` e as dependências de produção</span>
 </code></pre></div>
 <hr />
 <h3 id="cheat-sheet-boas-praticas-consolidadas">💡 Cheat Sheet: Boas Práticas Consolidadas<a class="headerlink" href="#cheat-sheet-boas-praticas-consolidadas" title="Permanent link">&para;</a></h3>
@@ -2230,8 +2234,8 @@
 <td>Imagem menor, mais limpa</td>
 </tr>
 <tr>
-<td><code>--only=production</code> no <code>npm install</code></td>
-<td>Não instala devDependencies</td>
+<td><code>--omit=dev</code> no <code>npm install</code></td>
+<td>Não instala devDependencies (substitui o antigo <code>--only=production</code>)</td>
 <td>Imagem menor, menos vulnerabilidades</td>
 </tr>
 <tr>
@@ -2242,12 +2246,12 @@
 <tr>
 <td>Multi-stage builds</td>
 <td>Separa build de runtime</td>
-<td>Imagem final 80% menor</td>
+<td>Imagem final sem ferramentas de build nem código-fonte</td>
 </tr>
 <tr>
-<td><code>:cached</code> em bind mounts (macOS/Windows)</td>
-<td>Otimiza performance de leitura do host</td>
-<td>Hot reload mais responsivo</td>
+<td><code>:cached</code> em bind mounts (macOS)</td>
+<td>Dica de desempenho das versões antigas do Docker Desktop (as atuais a ignoram)</td>
+<td>Inofensivo</td>
 </tr>
 <tr>
 <td><code>healthcheck</code> + <code>condition: service_healthy</code></td>

@@ -1684,7 +1684,7 @@ O README é a porta de entrada de qualquer repositório — o primeiro (às veze
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gs">**Aluno(a):**</span> Seu Nome Completo Aqui
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="gs">**Tutorial original:**</span> [<span class="nt">Como Criar um App "Todo List" com Elixir e LiveView</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="nt">do Zero</span>](<span class="na">https://github.com/LambdaGeo/tutoriais</span>)
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="nt">do Zero</span>](<span class="na">https://lambdageo-edu.github.io/lambdageo-tutorials/elixir/</span>)
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="gu">## Descrição</span>
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
@@ -1707,35 +1707,34 @@ O README é a porta de entrada de qualquer repositório — o primeiro (às veze
 <a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>| ---------- | --------- |
 <a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>| Erlang/OTP | 26+       |
 <a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>| Elixir     | 1.17+     |
-<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>| Node.js    | 18+ (LTS) |
-<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>
-<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="gu">## Como Rodar</span>
-<a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>
-<a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a><span class="sb">```bash</span>
-<a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/SEU-USUARIO/SEU-REPO.git
-<a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a><span class="nb">cd</span><span class="w"> </span>SEU-REPO
-<a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a>
-<a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a><span class="c1"># Instala dependências e prepara os assets</span>
-<a id="__codelineno-0-38" name="__codelineno-0-38" href="#__codelineno-0-38"></a>mix<span class="w"> </span>setup
-<a id="__codelineno-0-39" name="__codelineno-0-39" href="#__codelineno-0-39"></a>
-<a id="__codelineno-0-40" name="__codelineno-0-40" href="#__codelineno-0-40"></a><span class="c1"># Cria o banco SQLite e aplica as migrations</span>
-<a id="__codelineno-0-41" name="__codelineno-0-41" href="#__codelineno-0-41"></a>mix<span class="w"> </span>ecto.create
-<a id="__codelineno-0-42" name="__codelineno-0-42" href="#__codelineno-0-42"></a>mix<span class="w"> </span>ecto.migrate
-<a id="__codelineno-0-43" name="__codelineno-0-43" href="#__codelineno-0-43"></a>
-<a id="__codelineno-0-44" name="__codelineno-0-44" href="#__codelineno-0-44"></a><span class="c1"># Sobe o servidor</span>
-<a id="__codelineno-0-45" name="__codelineno-0-45" href="#__codelineno-0-45"></a>mix<span class="w"> </span>phx.server
-<a id="__codelineno-0-46" name="__codelineno-0-46" href="#__codelineno-0-46"></a><span class="sb">```</span>
-<a id="__codelineno-0-47" name="__codelineno-0-47" href="#__codelineno-0-47"></a>
-<a id="__codelineno-0-48" name="__codelineno-0-48" href="#__codelineno-0-48"></a>Depois, abra [<span class="nt">http://localhost:4000</span>](<span class="na">http://localhost:4000</span>) no navegador.
-<a id="__codelineno-0-49" name="__codelineno-0-49" href="#__codelineno-0-49"></a>
-<a id="__codelineno-0-50" name="__codelineno-0-50" href="#__codelineno-0-50"></a><span class="gu">## Estrutura Principal</span>
-<a id="__codelineno-0-51" name="__codelineno-0-51" href="#__codelineno-0-51"></a>
-<a id="__codelineno-0-52" name="__codelineno-0-52" href="#__codelineno-0-52"></a>| Arquivo                                      | Papel                               |
-<a id="__codelineno-0-53" name="__codelineno-0-53" href="#__codelineno-0-53"></a>| -------------------------------------------- | ----------------------------------- |
-<a id="__codelineno-0-54" name="__codelineno-0-54" href="#__codelineno-0-54"></a>| <span class="sb">`lib/elixir_todo_list_web/live/todo_live.ex`</span> | O LiveView (estado, eventos e HTML) |
-<a id="__codelineno-0-55" name="__codelineno-0-55" href="#__codelineno-0-55"></a>| <span class="sb">`lib/elixir_todo_list/task.ex`</span>               | O schema <span class="sb">`Task`</span> e seu changeset     |
-<a id="__codelineno-0-56" name="__codelineno-0-56" href="#__codelineno-0-56"></a>| <span class="sb">`lib/elixir_todo_list/repo.ex`</span>               | A conexão com o banco (Ecto.Repo)   |
-<a id="__codelineno-0-57" name="__codelineno-0-57" href="#__codelineno-0-57"></a>| <span class="sb">`priv/repo/migrations/`</span>                      | As migrations do banco              |
+<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>
+<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="gu">## Como Rodar</span>
+<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>
+<a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a><span class="sb">```bash</span>
+<a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/SEU-USUARIO/SEU-REPO.git
+<a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a><span class="nb">cd</span><span class="w"> </span>SEU-REPO
+<a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a>
+<a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a><span class="c1"># Instala dependências e prepara os assets</span>
+<a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a>mix<span class="w"> </span>setup
+<a id="__codelineno-0-38" name="__codelineno-0-38" href="#__codelineno-0-38"></a>
+<a id="__codelineno-0-39" name="__codelineno-0-39" href="#__codelineno-0-39"></a><span class="c1"># Cria o banco SQLite e aplica as migrations</span>
+<a id="__codelineno-0-40" name="__codelineno-0-40" href="#__codelineno-0-40"></a>mix<span class="w"> </span>ecto.create
+<a id="__codelineno-0-41" name="__codelineno-0-41" href="#__codelineno-0-41"></a>mix<span class="w"> </span>ecto.migrate
+<a id="__codelineno-0-42" name="__codelineno-0-42" href="#__codelineno-0-42"></a>
+<a id="__codelineno-0-43" name="__codelineno-0-43" href="#__codelineno-0-43"></a><span class="c1"># Sobe o servidor</span>
+<a id="__codelineno-0-44" name="__codelineno-0-44" href="#__codelineno-0-44"></a>mix<span class="w"> </span>phx.server
+<a id="__codelineno-0-45" name="__codelineno-0-45" href="#__codelineno-0-45"></a><span class="sb">```</span>
+<a id="__codelineno-0-46" name="__codelineno-0-46" href="#__codelineno-0-46"></a>
+<a id="__codelineno-0-47" name="__codelineno-0-47" href="#__codelineno-0-47"></a>Depois, abra [<span class="nt">http://localhost:4000</span>](<span class="na">http://localhost:4000</span>) no navegador.
+<a id="__codelineno-0-48" name="__codelineno-0-48" href="#__codelineno-0-48"></a>
+<a id="__codelineno-0-49" name="__codelineno-0-49" href="#__codelineno-0-49"></a><span class="gu">## Estrutura Principal</span>
+<a id="__codelineno-0-50" name="__codelineno-0-50" href="#__codelineno-0-50"></a>
+<a id="__codelineno-0-51" name="__codelineno-0-51" href="#__codelineno-0-51"></a>| Arquivo                                      | Papel                               |
+<a id="__codelineno-0-52" name="__codelineno-0-52" href="#__codelineno-0-52"></a>| -------------------------------------------- | ----------------------------------- |
+<a id="__codelineno-0-53" name="__codelineno-0-53" href="#__codelineno-0-53"></a>| <span class="sb">`lib/elixir_todo_list_web/live/todo_live.ex`</span> | O LiveView (estado, eventos e HTML) |
+<a id="__codelineno-0-54" name="__codelineno-0-54" href="#__codelineno-0-54"></a>| <span class="sb">`lib/elixir_todo_list/task.ex`</span>               | O schema <span class="sb">`Task`</span> e seu changeset     |
+<a id="__codelineno-0-55" name="__codelineno-0-55" href="#__codelineno-0-55"></a>| <span class="sb">`lib/elixir_todo_list/repo.ex`</span>               | A conexão com o banco (Ecto.Repo)   |
+<a id="__codelineno-0-56" name="__codelineno-0-56" href="#__codelineno-0-56"></a>| <span class="sb">`priv/repo/migrations/`</span>                      | As migrations do banco              |
 </code></pre></div>
 <h3 id="passo-82-o-teste-do-colega">🧪 Passo 8.2: O Teste do "Colega"<a class="headerlink" href="#passo-82-o-teste-do-colega" title="Permanent link">&para;</a></h3>
 <p>Faça de conta que você é outra pessoa: clone o seu repositório em uma <strong>pasta nova</strong> (ex: <code>/tmp/teste-todo</code>) e siga o seu próprio README, literalmente. A aplicação subiu? O CRUD funciona? Os dados persistem após reiniciar o servidor?</p>
@@ -1743,7 +1742,7 @@ O README é a porta de entrada de qualquer repositório — o primeiro (às veze
 <ol>
 <li><strong>Banco commitado</strong>: se <code>git status</code>/a página do GitHub mostrar <code>elixir_todo_list.db</code> (ou <code>.db-shm</code>/<code>.db-wal</code>), o <code>.gitignore</code> da Fase 0 não foi aplicado antes do commit. Corrija com:</li>
 </ol>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>git<span class="w"> </span>rm<span class="w"> </span>--cached<span class="w"> </span>elixir_todo_list.db<span class="w"> </span>elixir_todo_list.db-shm<span class="w"> </span>elixir_todo_list.db-wal
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>git<span class="w"> </span>rm<span class="w"> </span>--cached<span class="w"> </span>--ignore-unmatch<span class="w"> </span>elixir_todo_list.db<span class="w"> </span>elixir_todo_list.db-shm<span class="w"> </span>elixir_todo_list.db-wal
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Remove arquivos de banco do versionamento"</span>
 </code></pre></div>
 <ol>

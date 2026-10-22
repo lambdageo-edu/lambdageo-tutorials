@@ -1766,14 +1766,16 @@
 <p>O LiveView traz a <strong>simplicidade do desenvolvimento tradicional (HTML + servidor)</strong> com a <strong>interatividade do front moderno (SPA)</strong> — sem manter duas aplicações separadas.</p>
 <hr />
 <h3 id="passo-01-instalar-as-ferramentas">🧰 Passo 0.1: Instalar as Ferramentas<a class="headerlink" href="#passo-01-instalar-as-ferramentas" title="Permanent link">&para;</a></h3>
-<p>Precisamos de três coisas:</p>
+<p>Precisamos de duas coisas:</p>
 <ol>
-<li><strong>Node.js</strong> — o Phoenix o usa para compilar assets (CSS/JS);</li>
 <li><strong>Erlang</strong> — a máquina virtual (BEAM) sobre a qual o Elixir roda;</li>
 <li><strong>Elixir</strong> — a linguagem de programação.</li>
 </ol>
-<p><strong>1. Node.js:</strong> baixe e instale a versão <strong>LTS</strong> no <a href="https://nodejs.org/">site oficial</a>.</p>
-<p><strong>2. Elixir e Erlang (via script oficial):</strong> a maneira mais confiável, com controle exato das versões.</p>
+<div class="admonition note">
+<p class="admonition-title">E o Node.js?</p>
+<p>Desde o Phoenix 1.6, o Node.js <strong>não é mais necessário</strong>: os assets (JavaScript e CSS) são compilados pelos executáveis independentes do <strong>esbuild</strong> e do <strong>Tailwind</strong>, que o próprio Phoenix baixa na primeira execução. Você só vai precisar do Node se quiser instalar pacotes do npm no seu projeto.</p>
+</div>
+<p><strong>Elixir e Erlang (via script oficial):</strong> a maneira mais confiável, com controle exato das versões.</p>
 <ul>
 <li><strong>Linux/macOS (Bash):</strong></li>
 </ul>
@@ -1798,8 +1800,7 @@
 </code></pre></div>
 <p><strong>Verificação:</strong> feche e reabra o terminal, e confirme que tudo respondeu com uma versão:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>elixir<span class="w"> </span>--version<span class="w">   </span><span class="c1"># Elixir 1.17.x (compiled with Erlang/OTP 26)</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>node<span class="w"> </span>-v<span class="w">            </span><span class="c1"># v18 ou superior</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>git<span class="w"> </span>--version
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>git<span class="w"> </span>--version
 </code></pre></div>
 <p><em>(Se <code>elixir</code> não for encontrado, o <code>PATH</code> não foi configurado permanentemente — revise o passo acima antes de prosseguir.)</em></p>
 <h3 id="passo-02-instalar-o-hex-e-o-gerador-do-phoenix">🧱 Passo 0.2: Instalar o Hex e o Gerador do Phoenix<a class="headerlink" href="#passo-02-instalar-o-hex-e-o-gerador-do-phoenix" title="Permanent link">&para;</a></h3>
