@@ -24,7 +24,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.2">
     
     
       
@@ -32,10 +32,10 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
       
       
 
@@ -1717,7 +1717,7 @@
 </tr>
 <tr>
 <td><strong>Efemeridade</strong></td>
-<td>Containers são <strong>stateless</strong>. Tudo escrito dentro deles <strong>some</strong> ao parar/remover. Use volumes para persistir.</td>
+<td>Containers são <strong>stateless</strong>. O que é escrito dentro deles sobrevive a <code>stop</code>/<code>start</code>, mas <strong>some quando o container é removido</strong>. Use volumes para persistir.</td>
 </tr>
 </tbody>
 </table>
@@ -1854,7 +1854,7 @@
 <tr>
 <td></td>
 <td><code>docker compose down [-v]</code></td>
-<td>Para containers (<code>-v</code> remove volumes nomeados)</td>
+<td>Para <strong>e remove</strong> containers e redes (<code>-v</code> remove também os volumes nomeados)</td>
 </tr>
 <tr>
 <td></td>
@@ -1933,8 +1933,8 @@
 <li><code>docker compose ps</code> → Container está <code>Up</code> ou <code>Exited</code>?</li>
 <li><code>docker compose exec &lt;serviço&gt; sh</code> → Teste manualmente dentro do container.</li>
 <li><code>docker compose config</code> → YAML está sendo interpretado corretamente?</li>
-<li><code>docker system prune -f</code> → Espaço cheio travando o daemon?</li>
 </ol>
+<p>⚠️ Falta de espaço em disco? Confira com <code>docker system df</code>. O <code>docker system prune -f</code> <strong>apaga</strong> containers parados: só use depois de coletar os logs.</p>
 <p>📌 <strong>Dica de Ouro:</strong> <code>logs</code> primeiro. <code>inspect</code> depois. <code>exec</code> por último.</p>
 <hr />
 <p>🖨️ <em>Pronto para imprimir (1 página frente e verso).</em></p>
@@ -1994,10 +1994,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.top", "navigation.indexes", "navigation.instant", "navigation.sections", "navigation.expand", "content.code.copy", "content.code.annotate", "toc.integrate", "search.suggest", "search.highlight"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado para \u00e1rea de transfer\u00eancia", "clipboard.copy": "Copiar para \u00e1rea de transfer\u00eancia", "search.result.more.one": "mais 1 nesta p\u00e1gina", "search.result.more.other": "# mais nesta p\u00e1gina", "search.result.none": "Nenhum documento encontrado", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Digite para iniciar a busca", "search.result.term.missing": "Ausente", "select.version": "Selecione a vers\u00e3o"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.top", "navigation.indexes", "navigation.instant", "navigation.sections", "navigation.expand", "content.code.copy", "content.code.annotate", "toc.integrate", "search.suggest", "search.highlight"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado para \u00e1rea de transfer\u00eancia", "clipboard.copy": "Copiar para \u00e1rea de transfer\u00eancia", "search.result.more.one": "mais 1 nesta p\u00e1gina", "search.result.more.other": "# mais nesta p\u00e1gina", "search.result.none": "Nenhum documento encontrado", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Digite para iniciar a busca", "search.result.term.missing": "Ausente", "select.version": "Selecione a vers\u00e3o"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
     
   </body>

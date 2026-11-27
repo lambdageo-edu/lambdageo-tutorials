@@ -24,7 +24,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.2">
     
     
       
@@ -32,10 +32,10 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
       
       
 
@@ -1909,7 +1909,7 @@
 <p>Mostre na tela:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>--name<span class="w"> </span>web<span class="w"> </span>-p<span class="w"> </span><span class="m">8080</span>:80<span class="w"> </span>-v<span class="w"> </span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/html:/usr/share/nginx/html:ro<span class="w"> </span>nginx:alpine
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>--name<span class="w"> </span>cache<span class="w"> </span>-v<span class="w"> </span>cache_data:/data<span class="w"> </span>redis:alpine
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>--name<span class="w"> </span>app<span class="w"> </span>-p<span class="w"> </span><span class="m">3000</span>:3000<span class="w"> </span>-e<span class="w"> </span><span class="nv">DB_HOST</span><span class="o">=</span>cache<span class="w"> </span>--network<span class="w"> </span>app-net<span class="w"> </span>node:20-alpine
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>--name<span class="w"> </span>app<span class="w"> </span>-p<span class="w"> </span><span class="m">3000</span>:3000<span class="w"> </span>-e<span class="w"> </span><span class="nv">DB_HOST</span><span class="o">=</span>cache<span class="w"> </span>--network<span class="w"> </span>app-net<span class="w"> </span>node:24-alpine
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># ...e esta terceira linha só pode rodar DEPOIS das outras duas:</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="c1"># o `docker run` não tem nenhuma opção para declarar dependências.</span>
 </code></pre></div>
@@ -2201,7 +2201,7 @@
 <p>📦 <strong>Nota:</strong> Este código usa apenas o módulo nativo <code>http</code>. Não precisa instalar <code>express</code>. O <code>package.json</code> anterior já funciona perfeitamente.</p>
 <hr />
 <h3 id="appdockerfile">📄 <code>app/Dockerfile</code><a class="headerlink" href="#appdockerfile" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">FROM</span><span class="w"> </span><span class="s">node:20-alpine</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">FROM</span><span class="w"> </span><span class="s">node:24-alpine</span>
 <a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="k">WORKDIR</span><span class="w"> </span><span class="s">/app</span>
 <a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>
 <a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="k">COPY</span><span class="w"> </span>package*.json<span class="w"> </span>./
@@ -2214,7 +2214,7 @@
 </code></pre></div>
 <p>🔍 <strong>O que faz:</strong></p>
 <ul>
-<li><code>FROM node:20-alpine</code>: Imagem leve (~45 MB para baixar, bem menor que a <code>node:20</code> completa, que passa de 1 GB descompactada).</li>
+<li><code>FROM node:24-alpine</code>: Imagem leve (~45 MB para baixar, bem menor que a <code>node:24</code> completa, que passa de 1 GB descompactada).</li>
 <li><code>COPY package*.json ./</code> + <code>RUN npm install</code>: Aproveita cache do Docker. Só reinstala se <code>package.json</code> mudar.</li>
 <li><code>CMD ["npm", "start"]</code>: Processo principal (<code>PID 1</code>) que mantém o container vivo.</li>
 </ul>
@@ -2402,10 +2402,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.top", "navigation.indexes", "navigation.instant", "navigation.sections", "navigation.expand", "content.code.copy", "content.code.annotate", "toc.integrate", "search.suggest", "search.highlight"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado para \u00e1rea de transfer\u00eancia", "clipboard.copy": "Copiar para \u00e1rea de transfer\u00eancia", "search.result.more.one": "mais 1 nesta p\u00e1gina", "search.result.more.other": "# mais nesta p\u00e1gina", "search.result.none": "Nenhum documento encontrado", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Digite para iniciar a busca", "search.result.term.missing": "Ausente", "select.version": "Selecione a vers\u00e3o"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.top", "navigation.indexes", "navigation.instant", "navigation.sections", "navigation.expand", "content.code.copy", "content.code.annotate", "toc.integrate", "search.suggest", "search.highlight"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado para \u00e1rea de transfer\u00eancia", "clipboard.copy": "Copiar para \u00e1rea de transfer\u00eancia", "search.result.more.one": "mais 1 nesta p\u00e1gina", "search.result.more.other": "# mais nesta p\u00e1gina", "search.result.none": "Nenhum documento encontrado", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Digite para iniciar a busca", "search.result.term.missing": "Ausente", "select.version": "Selecione a vers\u00e3o"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
     
   </body>

@@ -24,7 +24,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.2">
     
     
       
@@ -32,10 +32,10 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
       
       
 
@@ -1781,7 +1781,8 @@
 <p><strong>Reproduza o erro de porta ocupada (de forma controlada):</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Tente subir outro container mapeando a MESMA porta do host</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>--name<span class="w"> </span>web2<span class="w"> </span>-p<span class="w"> </span><span class="m">8080</span>:80<span class="w"> </span>nginx:alpine
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="c1"># → docker: Error response from daemon: Ports are not available: exposing port TCP 0.0.0.0:8080 -&gt; 0.0.0.0:0: listen tcp 0.0.0.0:8080: bind: address already in use.</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="c1"># → docker: Error response from daemon: ... Bind for 0.0.0.0:8080 failed: port is already allocated</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1">#   (o texto exato varia conforme o sistema e a versão do Docker)</span>
 </code></pre></div>
 <p>🔍 <strong>Por que acontece:</strong> O Docker tenta fazer <code>bind()</code> na porta 8080 do host, mas o processo do primeiro container (<code>web</code>) já está ocupando esse socket. O kernel do host rejeita.</p>
 </li>
@@ -1789,14 +1790,15 @@
 <p><strong>Libere a porta e valide:</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>docker<span class="w"> </span>stop<span class="w"> </span>web
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>docker<span class="w"> </span>port<span class="w"> </span>web<span class="w">  </span><span class="c1"># → (sem output, container parado)</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>--name<span class="w"> </span>web2<span class="w"> </span>-p<span class="w"> </span><span class="m">8080</span>:80<span class="w"> </span>nginx:alpine<span class="w">  </span><span class="c1"># ✅ Agora funciona</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>docker<span class="w"> </span>rm<span class="w"> </span>web2<span class="w">   </span><span class="c1"># a tentativa que falhou deixou o web2 como "Created", segurando o nome</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>--name<span class="w"> </span>web2<span class="w"> </span>-p<span class="w"> </span><span class="m">8080</span>:80<span class="w"> </span>nginx:alpine<span class="w">  </span><span class="c1"># ✅ Agora funciona</span>
 </code></pre></div>
 </li>
 <li>
 <p><strong>Mapeamento seletivo (localhost apenas):</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>--name<span class="w"> </span>internal<span class="w"> </span>-p<span class="w"> </span><span class="m">127</span>.0.0.1:9090:80<span class="w"> </span>nginx:alpine
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>curl<span class="w"> </span>-sI<span class="w"> </span>http://localhost:9090<span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-n<span class="w"> </span><span class="m">1</span><span class="w">  </span><span class="c1"># ✅ Funciona</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="c1"># Tente acessar de outra máquina na rede: http://SEU_IP:9090 → ❌ Timeout</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="c1"># Tente acessar de outra máquina na rede: http://SEU_IP:9090 → ❌ Conexão recusada</span>
 </code></pre></div>
 <p>🔍 <strong>Use case:</strong> Serviços que você quer acessar apenas localmente (ex: admin panels, debug endpoints).</p>
 </li>
@@ -1830,7 +1832,7 @@
 <ul>
 <li>O <code>Warning</code> é padrão do <code>redis-cli</code> (senhas na CLI ficam visíveis no histórico e em <code>docker ps</code>).</li>
 <li>O <code>AUTH failed</code> acontece porque o Redis <strong>não estava configurado com senha</strong>. A variável <code>REDIS_PASSWORD</code> foi injetada no ambiente, mas o processo <code>redis-server</code> não foi programado para lê-la.</li>
-<li>O <code>PONG</code> aparece porque o Redis <strong>sempre responde ao <code>PING</code></strong>, independente de autenticação. O comando <code>PING</code> não exige auth; só comandos como <code>GET</code>, <code>SET</code>, <code>CONFIG</code> exigem.</li>
+<li>O <code>PONG</code> aparece porque <strong>não há senha configurada</strong>: qualquer cliente é aceito. Com senha, o próprio <code>PING</code> sem autenticação responde <code>NOAUTH Authentication required.</code></li>
 </ul>
 <p>🧪 <strong>Prove que a variável está lá (mas é ignorada):</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>cache<span class="w"> </span>env<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>REDIS
@@ -1951,10 +1953,6 @@
 <a id="__codelineno-16-18" name="__codelineno-16-18" href="#__codelineno-16-18"></a><span class="c1"># → Você está DENTRO do container. Teste manualmente:</span>
 <a id="__codelineno-16-19" name="__codelineno-16-19" href="#__codelineno-16-19"></a><span class="c1">#    wget -qO- localhost, cat /etc/hosts, etc.</span>
 <a id="__codelineno-16-20" name="__codelineno-16-20" href="#__codelineno-16-20"></a><span class="c1"># → Digite 'exit' para sair.</span>
-<a id="__codelineno-16-21" name="__codelineno-16-21" href="#__codelineno-16-21"></a>
-<a id="__codelineno-16-22" name="__codelineno-16-22" href="#__codelineno-16-22"></a><span class="c1"># 5. Ciclo de vida limpo</span>
-<a id="__codelineno-16-23" name="__codelineno-16-23" href="#__codelineno-16-23"></a>docker<span class="w"> </span>stop<span class="w"> </span>web<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>docker<span class="w"> </span>rm<span class="w"> </span>web
-<a id="__codelineno-16-24" name="__codelineno-16-24" href="#__codelineno-16-24"></a><span class="c1"># → Para graciosamente (SIGTERM) e remove. Use -f para forçar se travar.</span>
 </code></pre></div>
 <p>🧪 <strong>Experimentos Guiados:</strong></p>
 <ol>
@@ -1995,14 +1993,18 @@
 </code></pre></div>
 </li>
 </ol>
+<p>Quando terminar os experimentos, encerre o <code>web</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>docker<span class="w"> </span>stop<span class="w"> </span>web<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>docker<span class="w"> </span>rm<span class="w"> </span>web
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="c1"># → Para (SIGTERM) e remove. `docker rm -f` força de uma vez.</span>
+</code></pre></div>
 <p>📌 <strong>Fluxo de Debug Recomendado (sempre nesta ordem):</strong></p>
 <ol>
-<li><code>docker compose logs -f &lt;serviço&gt;</code> → O que o processo está reclamando?</li>
-<li><code>docker compose ps</code> → Container está <code>Up</code> ou <code>Exited (1)</code>?</li>
-<li><code>docker compose exec &lt;serviço&gt; sh</code> → Teste manualmente dentro do container.</li>
-<li><code>docker compose config</code> → YAML está sendo interpretado corretamente?</li>
-<li><code>docker system prune -f</code> → Espaço cheio travando o daemon?</li>
+<li><code>docker logs -f &lt;container&gt;</code> → O que o processo está reclamando?</li>
+<li><code>docker ps -a</code> → Container está <code>Up</code> ou <code>Exited (1)</code>?</li>
+<li><code>docker exec -it &lt;container&gt; sh</code> → Teste manualmente dentro do container.</li>
+<li><code>docker inspect &lt;container&gt;</code> → Portas, variáveis e redes estão como você pensa?</li>
 </ol>
+<p><em>(Com Docker Compose, os equivalentes são <code>docker compose logs</code>, <code>ps</code> e <code>exec</code>.)</em></p>
 <hr />
 <h3 id="transicao-natural-para-o-proximo-bloco">🎯 Transição Natural para o Próximo Bloco<a class="headerlink" href="#transicao-natural-para-o-proximo-bloco" title="Permanent link">&para;</a></h3>
 <blockquote>
@@ -2011,8 +2013,8 @@
 <hr />
 <h3 id="limpeza-antes-de-continuar">🧹 Limpeza Antes de Continuar<a class="headerlink" href="#limpeza-antes-de-continuar" title="Permanent link">&para;</a></h3>
 <p>Este bloco criou vários containers e uma rede (<code>web</code>, <code>web2</code>, <code>internal</code>, <code>db</code>, <code>cache</code>, <code>cache2</code>, <code>svc-a</code>, <code>svc-b</code>, <code>api</code>, <code>worker</code>, <code>bad</code>, <code>app-net</code>). Antes de seguir para o próximo capítulo, remova-os para começar do zero e evitar conflitos de porta ou nome:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>docker<span class="w"> </span>rm<span class="w"> </span>-f<span class="w"> </span>web<span class="w"> </span>web2<span class="w"> </span>internal<span class="w"> </span>db<span class="w"> </span>cache<span class="w"> </span>cache2<span class="w"> </span>svc-a<span class="w"> </span>svc-b<span class="w"> </span>api<span class="w"> </span>worker<span class="w"> </span>bad
-<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>docker<span class="w"> </span>network<span class="w"> </span>rm<span class="w"> </span>app-net
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>docker<span class="w"> </span>rm<span class="w"> </span>-f<span class="w"> </span>web<span class="w"> </span>web2<span class="w"> </span>internal<span class="w"> </span>db<span class="w"> </span>cache<span class="w"> </span>cache2<span class="w"> </span>svc-a<span class="w"> </span>svc-b<span class="w"> </span>api<span class="w"> </span>worker<span class="w"> </span>bad
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>docker<span class="w"> </span>network<span class="w"> </span>rm<span class="w"> </span>app-net
 </code></pre></div>
 <p><em>(Evite o atalho <code>docker rm -f $(docker ps -aq)</code>: ele apaga <strong>todos</strong> os containers da máquina, inclusive os de outros projetos seus.)</em></p>
 <blockquote></blockquote>
@@ -2071,10 +2073,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.top", "navigation.indexes", "navigation.instant", "navigation.sections", "navigation.expand", "content.code.copy", "content.code.annotate", "toc.integrate", "search.suggest", "search.highlight"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado para \u00e1rea de transfer\u00eancia", "clipboard.copy": "Copiar para \u00e1rea de transfer\u00eancia", "search.result.more.one": "mais 1 nesta p\u00e1gina", "search.result.more.other": "# mais nesta p\u00e1gina", "search.result.none": "Nenhum documento encontrado", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Digite para iniciar a busca", "search.result.term.missing": "Ausente", "select.version": "Selecione a vers\u00e3o"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.top", "navigation.indexes", "navigation.instant", "navigation.sections", "navigation.expand", "content.code.copy", "content.code.annotate", "toc.integrate", "search.suggest", "search.highlight"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado para \u00e1rea de transfer\u00eancia", "clipboard.copy": "Copiar para \u00e1rea de transfer\u00eancia", "search.result.more.one": "mais 1 nesta p\u00e1gina", "search.result.more.other": "# mais nesta p\u00e1gina", "search.result.none": "Nenhum documento encontrado", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Digite para iniciar a busca", "search.result.term.missing": "Ausente", "select.version": "Selecione a vers\u00e3o"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
     
   </body>
