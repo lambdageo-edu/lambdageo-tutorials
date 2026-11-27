@@ -82,7 +82,13 @@ polyglot-compose/
     async function loadTodos() {
       const res = await fetch(`${NODE_API}/todos`);
       const todos = await res.json();
-      document.getElementById('todoList').innerHTML = todos.map(t => `<li>${t.title}</li>`).join('');
+      // textContent exibe o título como texto: nunca monte HTML com dados do usuário (XSS).
+      const items = todos.map(t => {
+        const li = document.createElement('li');
+        li.textContent = t.title;
+        return li;
+      });
+      document.getElementById('todoList').replaceChildren(...items);
     }
 
     async function addTodo() {
@@ -116,7 +122,7 @@ polyglot-compose/
   "name": "node-api",
   "version": "1.0.0",
   "main": "index.js",
-  "dependencies": { "express": "^4.18.2", "pg": "^8.11.3", "cors": "^2.8.5" }
+  "dependencies": { "express": "^5.2.1", "pg": "^8.23.1", "cors": "^2.8.6" }
 }
 ```
 
@@ -138,13 +144,21 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD,
 });
 
+// Erro em conexão ociosa (ex.: banco reiniciado) não deve derrubar a API.
+pool.on('error', err => console.error('Erro no pool:', err.message));
+
+// No Express 5, um erro em rota async vira resposta 500 em vez de encerrar o processo.
 app.get('/todos', async (_, res) => {
   const { rows } = await pool.query('SELECT * FROM todos ORDER BY id DESC');
   res.json(rows);
 });
 
 app.post('/todos', async (req, res) => {
-  const { title } = req.body;
+  // Nunca confie na entrada: valide tipo, tamanho e conteúdo.
+  const title = typeof req.body?.title === 'string' ? req.body.title.trim() : '';
+  if (!title || title.length > 200 || title.includes('\0')) {
+    return res.status(400).json({ error: 'título inválido (1 a 200 caracteres)' });
+  }
   const { rows } = await pool.query('INSERT INTO todos (title) VALUES ($1) RETURNING *', [title]);
   res.status(201).json(rows[0]);
 });
@@ -162,7 +176,7 @@ pool.query(`CREATE TABLE IF NOT EXISTS todos (id SERIAL PRIMARY KEY, title TEXT,
 ### 🟢 `node-api/Dockerfile`
 
 ```docker
-FROM node:20-alpine
+FROM node:24-alpine
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
@@ -215,15 +229,15 @@ if __name__ == "__main__":
 `requirements.txt`
 
 ```
-fastapi==0.104.1
-uvicorn==0.24.0
-psycopg2-binary==2.9.9
+fastapi==0.165.0
+uvicorn==0.54.0
+psycopg2-binary==2.9.13
 ```
 
 `Dockerfile`
 
 ```docker
-FROM python:3.11-slim
+FROM python:3.14-slim
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
@@ -295,7 +309,7 @@ services:
       - python-svc
 
 volumes:
-  _________
+  _________:
 ```
 
 ---

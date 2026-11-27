@@ -10,7 +10,7 @@
 | --- | --- |
 | **VM vs Container** | VM = SO completo + hardware virtual (pesado). Container = processo isolado usando kernel do host (leve, boot em ms). |
 | **Imagem ≠ Container** | Imagem = camadas `read-only` (receita). Container = instância em execução + camada gravável no topo (bolo). |
-| **Efemeridade** | Containers são **stateless**. Tudo escrito dentro deles **some** ao parar/remover. Use volumes para persistir. |
+| **Efemeridade** | Containers são **stateless**. O que é escrito dentro deles sobrevive a `stop`/`start`, mas **some quando o container é removido**. Use volumes para persistir. |
 
 ---
 
@@ -58,7 +58,7 @@
 |  | `docker inspect nome` | JSON completo (IPs, mounts, config) |
 |  | `docker stats` | CPU/MEM/NET em tempo real |
 | **Compose** | `docker compose up -d [--build]` | Sobe tudo em background (rebuild se mudar `Dockerfile`) |
-|  | `docker compose down [-v]` | Para containers (`-v` remove volumes nomeados) |
+|  | `docker compose down [-v]` | Para **e remove** containers e redes (`-v` remove também os volumes nomeados) |
 |  | `docker compose logs -f [servico]` | Logs em tempo real (filtre por serviço) |
 |  | `docker compose ps / exec / config` | Estado, terminal interativo, valida YAML |
 | **Limpeza** | `docker system df` | Espaço usado por Docker |
@@ -95,7 +95,8 @@
 2. `docker compose ps` → Container está `Up` ou `Exited`?
 3. `docker compose exec <serviço> sh` → Teste manualmente dentro do container.
 4. `docker compose config` → YAML está sendo interpretado corretamente?
-5. `docker system prune -f` → Espaço cheio travando o daemon?
+
+⚠️ Falta de espaço em disco? Confira com `docker system df`. O `docker system prune -f` **apaga** containers parados: só use depois de coletar os logs.
 
 📌 **Dica de Ouro:** `logs` primeiro. `inspect` depois. `exec` por último.
 

@@ -17,7 +17,7 @@
 Cada instrução no `Dockerfile` cria uma camada `read-only`. O Docker armazena essas camadas em cache e **reutiliza** se a instrução e seus arquivos de contexto não mudaram.
 
 ```docker
-FROM node:20-alpine        # Camada 1: imagem base
+FROM node:24-alpine        # Camada 1: imagem base
 WORKDIR /app               # Camada 2: cria diretório
 COPY package*.json ./      # Camada 3: copia manifestos
 RUN npm install            # Camada 4: instala dependências ← CACHEABLE
@@ -98,7 +98,7 @@ Para projetos que compilam código (TypeScript, Go, Java) ou instalam dependênc
 # ─────────────────────────────────────
 # ESTÁGIO 1: BUILD (compila/transpila)
 # ─────────────────────────────────────
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 
 WORKDIR /app
 
@@ -113,7 +113,7 @@ RUN npm run build  # Gera pasta dist/ com código transpilado
 # ─────────────────────────────────────
 # ESTÁGIO 2: RUNTIME (imagem final mínima)
 # ─────────────────────────────────────
-FROM node:20-alpine
+FROM node:24-alpine
 
 # Metadados para auditoria
 LABEL maintainer="seu-email@example.com"
@@ -243,7 +243,7 @@ services:
 
   # Opcional: serviço de debug com inspector
   debug:
-    image: node:20-alpine
+    image: node:24-alpine
     volumes:
       - ./app:/app
     working_dir: /app
@@ -256,7 +256,7 @@ services:
 ### `app/Dockerfile.dev` (para hot reload)
 
 ```docker
-FROM node:20-alpine
+FROM node:24-alpine
 
 WORKDIR /app
 
