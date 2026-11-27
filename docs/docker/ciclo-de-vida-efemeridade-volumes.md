@@ -24,7 +24,8 @@ O Alpine é minimalista. Se você rodar `docker run -d alpine echo "oi"`, o `ech
 ```bash
 # 3. Pare o container graciosamente
 docker stop tmp
-# → Envia SIGTERM ao PID 1. O container finaliza.
+# → Envia SIGTERM ao PID 1. Se ele não encerrar em 10 s, o Docker envia SIGKILL.
+#   Repare que este comando demora!
 
 # 4. Tente listá-lo
 docker ps | grep tmp
@@ -32,12 +33,14 @@ docker ps | grep tmp
 
 # 5. Liste TODOS os containers (incluindo parados)
 docker ps -a | grep tmp
-# → STATUS: Exited (0) 10 seconds ago
+# → STATUS: Exited (137) 10 seconds ago
 ```
 
 🧠 **Conceito-chave:**
 
 `docker ps` = só rodando. `docker ps -a` = histórico completo.
+
+🔍 **Por que `137` e não `0`?** O PID 1 de um container não recebe o tratamento padrão de sinais do Linux: se o programa não registrar um tratador para o SIGTERM, o sinal é ignorado. É o caso do `sleep`. Depois de 10 s o Docker o mata com SIGKILL (137 = 128 + 9). Na sua aplicação, trate o SIGTERM para encerrar conexões corretamente, ou use `docker run --init`.
 
 Um container `Exited` **ainda existe no disco** (como um serviço parado no Windows). Ele não foi deletado.
 
@@ -185,6 +188,7 @@ O Docker cria e gerencia o armazenamento em `/var/lib/docker/volumes/`. Ideal pa
 docker volume create pg_data
 
 # 2. Subir Postgres usando o volume
+# (mantenha a tag 16: a partir do Postgres 18 o ponto de montagem passa a ser /var/lib/postgresql)
 docker run -d --name db-test -v pg_data:/var/lib/postgresql/data -e POSTGRES_PASSWORD=secret postgres:16-alpine
 
 # 3. Aguarde inicialização (~5s)

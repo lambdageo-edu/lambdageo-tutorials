@@ -56,7 +56,8 @@ curl -sI http://localhost:8080 | head -n 1
     ```bash
     # Tente subir outro container mapeando a MESMA porta do host
     docker run -d --name web2 -p 8080:80 nginx:alpine
-    # → docker: Error response from daemon: Ports are not available: exposing port TCP 0.0.0.0:8080 -> 0.0.0.0:0: listen tcp 0.0.0.0:8080: bind: address already in use.
+    # → docker: Error response from daemon: ... Bind for 0.0.0.0:8080 failed: port is already allocated
+    #   (o texto exato varia conforme o sistema e a versão do Docker)
     ```
     
     🔍 **Por que acontece:** O Docker tenta fazer `bind()` na porta 8080 do host, mas o processo do primeiro container (`web`) já está ocupando esse socket. O kernel do host rejeita.
@@ -66,6 +67,7 @@ curl -sI http://localhost:8080 | head -n 1
     ```bash
     docker stop web
     docker port web  # → (sem output, container parado)
+    docker rm web2   # a tentativa que falhou deixou o web2 como "Created", segurando o nome
     docker run -d --name web2 -p 8080:80 nginx:alpine  # ✅ Agora funciona
     ```
     
@@ -74,7 +76,7 @@ curl -sI http://localhost:8080 | head -n 1
     ```bash
     docker run -d --name internal -p 127.0.0.1:9090:80 nginx:alpine
     curl -sI http://localhost:9090 | head -n 1  # ✅ Funciona
-    # Tente acessar de outra máquina na rede: http://SEU_IP:9090 → ❌ Timeout
+    # Tente acessar de outra máquina na rede: http://SEU_IP:9090 → ❌ Conexão recusada
     ```
     
     🔍 **Use case:** Serviços que você quer acessar apenas localmente (ex: admin panels, debug endpoints).
@@ -122,7 +124,7 @@ docker exec -it cache redis-cli -a 123 ping
 
 - O `Warning` é padrão do `redis-cli` (senhas na CLI ficam visíveis no histórico e em `docker ps`).
 - O `AUTH failed` acontece porque o Redis **não estava configurado com senha**. A variável `REDIS_PASSWORD` foi injetada no ambiente, mas o processo `redis-server` não foi programado para lê-la.
-- O `PONG` aparece porque o Redis **sempre responde ao `PING`**, independente de autenticação. O comando `PING` não exige auth; só comandos como `GET`, `SET`, `CONFIG` exigem.
+- O `PONG` aparece porque **não há senha configurada**: qualquer cliente é aceito. Com senha, o próprio `PING` sem autenticação responde `NOAUTH Authentication required.`
 
 🧪 **Prove que a variável está lá (mas é ignorada):**
 
@@ -273,10 +275,6 @@ docker exec -it web sh
 # → Você está DENTRO do container. Teste manualmente:
 #    wget -qO- localhost, cat /etc/hosts, etc.
 # → Digite 'exit' para sair.
-
-# 5. Ciclo de vida limpo
-docker stop web && docker rm web
-# → Para graciosamente (SIGTERM) e remove. Use -f para forçar se travar.
 ```
 
 🧪 **Experimentos Guiados:**
@@ -325,13 +323,21 @@ docker stop web && docker rm web
     ```
     
 
+Quando terminar os experimentos, encerre o `web`:
+
+```bash
+docker stop web && docker rm web
+# → Para (SIGTERM) e remove. `docker rm -f` força de uma vez.
+```
+
 📌 **Fluxo de Debug Recomendado (sempre nesta ordem):**
 
-1. `docker compose logs -f <serviço>` → O que o processo está reclamando?
-2. `docker compose ps` → Container está `Up` ou `Exited (1)`?
-3. `docker compose exec <serviço> sh` → Teste manualmente dentro do container.
-4. `docker compose config` → YAML está sendo interpretado corretamente?
-5. `docker system prune -f` → Espaço cheio travando o daemon?
+1. `docker logs -f <container>` → O que o processo está reclamando?
+2. `docker ps -a` → Container está `Up` ou `Exited (1)`?
+3. `docker exec -it <container> sh` → Teste manualmente dentro do container.
+4. `docker inspect <container>` → Portas, variáveis e redes estão como você pensa?
+
+_(Com Docker Compose, os equivalentes são `docker compose logs`, `ps` e `exec`.)_
 
 ---
 
